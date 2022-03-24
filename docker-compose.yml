@@ -1,0 +1,10 @@
+version: '2'
+services:
+  mysql-docker:
+    image: mysql/mysql-server:5.7
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: speaker
+    ports:
+      - "3306:3306"
