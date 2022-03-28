@@ -1,0 +1,61 @@
+import org.jooq.util.GenerationTool
+import org.jooq.util.jaxb.Configuration
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'mysql:mysql-connector-java:8.0.28'
+        classpath'org.jooq:jooq-codegen:3.9.1'
+        classpath 'javax.xml.bind:jaxb-api:2.3.0'
+        classpath 'com.sun.xml.bind:jaxb-core:2.3.0'
+        classpath 'com.sun.xml.bind:jaxb-impl:2.3.0'
+        classpath 'javax.activation:javax.activation-api:1.2.0'
+    }
+}
+
+task generateJooq doLast {
+    def writer = new StringWriter()
+    def xml = new groovy.xml.MarkupBuilder(writer)
+            .configuration('xmlns': 'http://www.jooq.org/xsd/jooq-codegen-3.9.0.xsd') {
+                jdbc() {
+                    driver('com.mysql.cj.jdbc.Driver')
+                    url("jdbc:mysql://localhost:3306/speaker")
+                    user('root')
+                    password('root')
+                }
+                generator() {
+                    database() {
+                        inputSchema 'speaker'
+                        includes 'account'
+
+                        include '.*'
+                        excludes 'schema_version'
+                        includeTables true
+                        includeRoutines true
+                        includePackages false
+                        includeUDTs true
+                        includeSequences true
+                    }
+
+                    generate([:]) {
+                        pojos false
+                        daos false
+
+                        deprecated false
+                        records false
+                        interfaces true
+                        fluentSetters true
+                    }
+                    target() {
+                        packageName('com.speaker.db.jooq.generated')
+                        directory("$projectDir/src/main/java")
+                    }
+                }
+            }
+
+    GenerationTool.generate(
+            javax.xml.bind.JAXB.unmarshal(new StringReader(writer.toString()), Configuration.class)
+    )
+}
