@@ -1,18 +1,20 @@
-package com.speaker.service;
+package com.speaker.convertors;
 
-import com.speaker.DTO.AccountDTO;
+import com.speaker.dto.AccountDTO;
 import com.speaker.entities.Account;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Component
 public class AccountConverter {
-    public List<AccountDTO> convertToAccountDTO(List<Account> account) {
-        return account.stream()
-                .map(a -> new AccountDTO(a.getName(), a.getLastName(), a.getAge(), a.getCountryId(), a.getCityId()))
-                .collect(Collectors.toUnmodifiableList());
+    public AccountDTO convertToAccountDTO(Account account) {
+        return AccountDTO.builder()
+                .id(account.getId())
+                .name(account.getName())
+                .lastName(account.getLastName())
+                .age(account.getAge())
+                .countryId(account.getCountryId())
+                .cityId(account.getCityId())
+                .build();
     }
 
     public Account convertToAccount(AccountDTO accountDTO) {

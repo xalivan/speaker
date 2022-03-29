@@ -1,6 +1,6 @@
 package com.speaker.controller;
 
-import com.speaker.DTO.AccountDTO;
+import com.speaker.dto.AccountDTO;
 import com.speaker.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
