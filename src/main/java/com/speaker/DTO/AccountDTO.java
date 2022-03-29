@@ -1,11 +1,9 @@
-package com.speaker.entities;
+package com.speaker.DTO;
 
-import lombok.Builder;
 import lombok.Data;
+
 @Data
-@Builder
-public class Account {
-    private final int id;
+public class AccountDTO {
     private final String name;
     private final String lastName;
     private final int age;

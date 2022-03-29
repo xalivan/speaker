@@ -1,6 +1,7 @@
 package com.speaker.repository;
 
 import com.speaker.entities.Account;
+import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
@@ -9,12 +10,9 @@ import java.util.List;
 import static com.speaker.db.jooq.generated.tables.Account.ACCOUNT;
 
 @Repository
+@RequiredArgsConstructor
 public class AccountRepositoryImpl implements AccountRepository {
     private final DSLContext dsl;
-
-    public AccountRepositoryImpl(DSLContext dsl) {
-        this.dsl = dsl;
-    }
 
     @Override
     public List<Account> findAll() {
