@@ -1,11 +1,11 @@
 package com.speaker.service;
 
-import com.speaker.entities.Account;
+import com.speaker.DTO.AccountDTO;
 
 import java.util.List;
 
 public interface AccountService {
-    List<Account> findAll();
+    List<AccountDTO> findAll();
 
-    int insert(Account account);
+    int create(AccountDTO account);
 }

@@ -1,7 +1,6 @@
 package com.speaker.controller;
 
 import com.speaker.DTO.AccountDTO;
-import com.speaker.entities.Account;
 import com.speaker.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +16,11 @@ public class AccountController {
 
     @PostMapping
     public ResponseEntity<Integer> create(@RequestBody AccountDTO accountDTO) {
-        Account account = Account.builder()
-                .name(accountDTO.getName())
-                .lastName(accountDTO.getLastName())
-                .age(accountDTO.getAge())
-                .countryId(accountDTO.getCountryId())
-                .cityId(accountDTO.getCityId())
-                .build();
-        return ResponseEntity.ok(accountService.insert(account));
+        return ResponseEntity.ok(accountService.create(accountDTO));
     }
 
     @GetMapping
-    public List<Account> getAll() {
+    public List<AccountDTO> getAll() {
         return accountService.findAll();
     }
 }

@@ -1,6 +1,6 @@
 package com.speaker.service;
 
-import com.speaker.entities.Account;
+import com.speaker.DTO.AccountDTO;
 import com.speaker.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,14 +11,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
+    private final AccountConverter accountConverter;
 
     @Override
-    public List<Account> findAll() {
-        return accountRepository.findAll();
+    public List<AccountDTO> findAll() {
+        return accountConverter.convertToAccountDTO(accountRepository.findAll());
     }
 
     @Override
-    public int insert(Account account) {
-        return accountRepository.insert(account);
+    public int create(AccountDTO accountDTO) {
+        return accountRepository.create(accountConverter.convertToAccount(accountDTO));
     }
 }
