@@ -3,7 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
 }
-
+apply from: 'jooq.gradle'
 group = 'com'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
@@ -15,15 +15,25 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
     implementation group: 'mysql', name: 'mysql-connector-java'
     implementation group: 'org.liquibase', name: 'liquibase-core'
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jooq'
+    implementation group: 'org.jooq', name: 'jooq-codegen', version: '3.16.5'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+
+//    implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+//    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+//    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
