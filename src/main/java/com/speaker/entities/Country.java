@@ -1,12 +1,10 @@
 package com.speaker.entities;
 
+import lombok.Data;
 
-public enum Country {
-    UKRAINE (1),
-    USA (2);
-    private int id;
-
-    Country(int id) {
-        this.id = id;
-    }
+@Data
+public class Country {
+     private final int id;
+     private final CountryName name;
+     private final City city;
 }

@@ -28,7 +28,7 @@ task generateJooq doLast {
                 generator() {
                     database() {
                         inputSchema 'speaker'
-                        includes 'account'
+                        includes 'account|city|city_name|country|country_name|message|status'
 
                         include '.*'
                         excludes 'schema_version'

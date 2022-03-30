@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class Messages {
+public class Message {
     private final int id;
     private final int fromAccountId;
     private final String text;
