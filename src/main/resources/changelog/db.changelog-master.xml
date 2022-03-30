@@ -17,38 +17,7 @@
             <column name="last_name" type="VARCHAR(255)"/>
             <column name="age" type="INTEGER"/>
             <column name="country" type="INTEGER"/>
-
-            <column name="city_id" type="INTEGER"/>
         </createTable>
-<!--        public class Account {-->
-<!--        private final int id;-->
-<!--        private final String name;-->
-<!--        private final String lastName;-->
-<!--        private final int age;-->
-<!--        private final Country country;-->
-<!--        private final List<Account> friends;-->
-<!--        private final List<Message> massages;-->
-<!--        }-->
-    </changeSet>
-
-    <changeSet author="Mazur" id="changelog-2.0">
-        <createTable tableName="city_name">
-            <column name="city_name" type="VARCHAR(255)"/>
-        </createTable>
-
-        <insert tableName="city_name">
-            <column name="city_name" value="KYIV"/>
-            <column name="city_name" value="NEW_YORK"/>
-        </insert>
-
-        <createTable tableName="country_name">
-            <column name="country_name" type="VARCHAR(255)"/>
-        </createTable>
-
-        <insert tableName="country_name">
-            <column name="country_name" value="UKRAINE"/>
-            <column name="country_name" value="USA"/>
-        </insert>
 
         <createTable tableName="city">
             <column autoIncrement="true" name="id" type="INTEGER">
@@ -57,10 +26,6 @@
             <column name="name" type="VARCHAR(255)"/>
             <column name="country_id" type="INTEGER"/>
         </createTable>
-
-        <addForeignKeyConstraint baseTableName="city" baseColumnNames="city_name"
-                                 constraintName="fk_city_to_city_name"
-                                 referencedTableName="name" referencedColumnNames="country_name"/>
 
         <createTable tableName="country">
             <column autoIncrement="true" name="id" type="INTEGER">
@@ -73,16 +38,6 @@
         <addForeignKeyConstraint baseTableName="city" baseColumnNames="country"
                                  constraintName="fk_city_to_country"
                                  referencedTableName="country_id" referencedColumnNames="id"/>
-
-        <createTable tableName="status">
-            <column name="status" type="VARCHAR(255)"/>
-        </createTable>
-
-        <insert tableName="status">
-            <column name="status" value="NEW"/>
-            <column name="status" value="READ"/>
-            <column name="status" value="DELETED"/>
-        </insert>
 
         <createTable tableName="message">
             <column autoIncrement="true" name="id" type="INTEGER">
