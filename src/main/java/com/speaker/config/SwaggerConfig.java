@@ -13,8 +13,8 @@ public class SwaggerConfig {
     public Docket createRestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("com.speaker.controller"))
+                .paths(PathSelectors.ant("/accounts"))
                 .build();
     }
 }
