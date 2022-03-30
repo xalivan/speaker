@@ -2,12 +2,14 @@ package com.speaker.controller;
 
 import com.speaker.dto.AccountDTO;
 import com.speaker.service.AccountService;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Api
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("accounts")
