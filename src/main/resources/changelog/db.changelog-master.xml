@@ -16,9 +16,12 @@
             <column name="name" type="VARCHAR(255)"/>
             <column name="last_name" type="VARCHAR(255)"/>
             <column name="age" type="INTEGER"/>
-            <column name="country" type="INTEGER"/>
+            <column name="country_id" type="INTEGER"/>
+            <column name="city_id" type="INTEGER"/>
         </createTable>
+    </changeSet>
 
+    <changeSet author="Mazur" id="changelog-2.0">
         <createTable tableName="city">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true"/>
@@ -32,12 +35,11 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="name" type="VARCHAR(255)"/>
-            <column name="city" type="VARCHAR(255)"/>
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="city" baseColumnNames="country"
+        <addForeignKeyConstraint baseTableName="city" baseColumnNames="country_id"
                                  constraintName="fk_city_to_country"
-                                 referencedTableName="country_id" referencedColumnNames="id"/>
+                                 referencedTableName="country" referencedColumnNames="id"/>
 
         <createTable tableName="message">
             <column autoIncrement="true" name="id" type="INTEGER">
@@ -48,10 +50,6 @@
             <column name="date" type="TIMESTAMP"/>
             <column name="status" type="VARCHAR(255)"/>
         </createTable>
-
-        <addForeignKeyConstraint baseTableName="message" baseColumnNames="status"
-                                 constraintName="fk_message_to_status"
-                                 referencedTableName="status" referencedColumnNames="status"/>
 
     </changeSet>
 </databaseChangeLog>

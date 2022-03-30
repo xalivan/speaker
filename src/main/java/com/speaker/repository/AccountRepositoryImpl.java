@@ -16,15 +16,15 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public List<Account> findAll() {
-        return dsl.select(ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE, ACCOUNT.COUNTRY_ID, ACCOUNT.CITY_ID)
+        return dsl.select(ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE)
                 .from(ACCOUNT)
                 .fetchInto(Account.class);
     }
 
     @Override
     public int insert(Account account) {
-        return dsl.insertInto(ACCOUNT, ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE, ACCOUNT.COUNTRY_ID, ACCOUNT.CITY_ID)
-                .values(account.getId(), account.getName(), account.getLastName(), account.getAge(), account.getCountryId(), account.getCityId())
+        return dsl.insertInto(ACCOUNT, ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE)
+                .values(account.getId(), account.getName(), account.getLastName(), account.getAge())
                 .execute();
     }
 }
