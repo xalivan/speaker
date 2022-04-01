@@ -14,5 +14,5 @@ public class Account {
     private final int age;
     private final Country country;
     private final List<Account> friends;
-    private final List<Message> massages;
+    private List<Message> massages;
 }

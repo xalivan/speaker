@@ -1,9 +1,11 @@
 package com.speaker.entities;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@ApiModel
 @Data
 public class Message {
     private final int id;
