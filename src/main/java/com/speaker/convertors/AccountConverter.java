@@ -12,8 +12,6 @@ public class AccountConverter {
                 .name(account.getName())
                 .lastName(account.getLastName())
                 .age(account.getAge())
-                .countryId(account.getCountryId())
-                .cityId(account.getCityId())
                 .build();
     }
 
@@ -22,8 +20,6 @@ public class AccountConverter {
                 .name(accountDTO.getName())
                 .lastName(accountDTO.getLastName())
                 .age(accountDTO.getAge())
-                .countryId(accountDTO.getCountryId())
-                .cityId(accountDTO.getCityId())
                 .build();
     }
 }
