@@ -5,6 +5,10 @@ package com.speaker.db.jooq.generated;
 
 
 import com.speaker.db.jooq.generated.tables.Account;
+import com.speaker.db.jooq.generated.tables.City;
+import com.speaker.db.jooq.generated.tables.Country;
+import com.speaker.db.jooq.generated.tables.Friends;
+import com.speaker.db.jooq.generated.tables.Message;
 
 import javax.annotation.Generated;
 
@@ -26,4 +30,24 @@ public class Tables {
      * The table <code>speaker.account</code>.
      */
     public static final Account ACCOUNT = com.speaker.db.jooq.generated.tables.Account.ACCOUNT;
+
+    /**
+     * The table <code>speaker.city</code>.
+     */
+    public static final City CITY = com.speaker.db.jooq.generated.tables.City.CITY;
+
+    /**
+     * The table <code>speaker.country</code>.
+     */
+    public static final Country COUNTRY = com.speaker.db.jooq.generated.tables.Country.COUNTRY;
+
+    /**
+     * The table <code>speaker.friends</code>.
+     */
+    public static final Friends FRIENDS = com.speaker.db.jooq.generated.tables.Friends.FRIENDS;
+
+    /**
+     * The table <code>speaker.message</code>.
+     */
+    public static final Message MESSAGE = com.speaker.db.jooq.generated.tables.Message.MESSAGE;
 }

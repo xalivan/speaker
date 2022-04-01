@@ -5,6 +5,10 @@ package com.speaker.db.jooq.generated;
 
 
 import com.speaker.db.jooq.generated.tables.Account;
+import com.speaker.db.jooq.generated.tables.City;
+import com.speaker.db.jooq.generated.tables.Country;
+import com.speaker.db.jooq.generated.tables.Friends;
+import com.speaker.db.jooq.generated.tables.Message;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +34,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Speaker extends SchemaImpl {
 
-    private static final long serialVersionUID = 1652119789;
+    private static final long serialVersionUID = -1786459021;
 
     /**
      * The reference instance of <code>speaker</code>
@@ -41,6 +45,26 @@ public class Speaker extends SchemaImpl {
      * The table <code>speaker.account</code>.
      */
     public final Account ACCOUNT = com.speaker.db.jooq.generated.tables.Account.ACCOUNT;
+
+    /**
+     * The table <code>speaker.city</code>.
+     */
+    public final City CITY = com.speaker.db.jooq.generated.tables.City.CITY;
+
+    /**
+     * The table <code>speaker.country</code>.
+     */
+    public final Country COUNTRY = com.speaker.db.jooq.generated.tables.Country.COUNTRY;
+
+    /**
+     * The table <code>speaker.friends</code>.
+     */
+    public final Friends FRIENDS = com.speaker.db.jooq.generated.tables.Friends.FRIENDS;
+
+    /**
+     * The table <code>speaker.message</code>.
+     */
+    public final Message MESSAGE = com.speaker.db.jooq.generated.tables.Message.MESSAGE;
 
     /**
      * No further instances allowed
@@ -67,6 +91,10 @@ public class Speaker extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
-            Account.ACCOUNT);
+            Account.ACCOUNT,
+            City.CITY,
+            Country.COUNTRY,
+            Friends.FRIENDS,
+            Message.MESSAGE);
     }
 }
