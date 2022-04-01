@@ -40,7 +40,7 @@
         <addForeignKeyConstraint baseTableName="city" baseColumnNames="country_id"
                                  constraintName="fk_city_to_country"
                                  referencedTableName="country" referencedColumnNames="id"/>
-??
+
         <createTable tableName="fiends">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true"/>
@@ -52,7 +52,7 @@
         <addForeignKeyConstraint baseTableName="account" baseColumnNames="id"
                                  constraintName="fk_account_to_friends"
                                  referencedTableName="friends" referencedColumnNames="account_id"/>
-??
+
         <createTable tableName="message">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true"/>
