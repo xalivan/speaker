@@ -1,7 +1,7 @@
 package com.speaker.service;
 
-import com.speaker.dto.AccountDTO;
 import com.speaker.convertors.AccountConverter;
+import com.speaker.dto.AccountDTO;
 import com.speaker.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<AccountDTO> findAll() {
         return accountRepository.findAll().stream()
-                 .map( accountConverter::convertToAccountDTO)
-                 .collect(Collectors.toList());
+                .map(accountConverter::convertToAccountDTO)
+                .collect(Collectors.toList());
     }
 
     @Override

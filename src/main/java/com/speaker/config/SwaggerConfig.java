@@ -21,7 +21,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.speaker.controller"))
-                .paths(PathSelectors.ant("/accounts"))
+                .paths(PathSelectors.ant("/*"))
                 .build();
     }
     @Bean
