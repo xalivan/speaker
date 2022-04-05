@@ -5,6 +5,6 @@ import com.speaker.entities.Message;
 import java.util.List;
 
 public interface MessageRepository {
-    List<Message> findAllById(int id);
+    List<Message> findAllByAccountId(int id);
     int insert(Message message);
 }

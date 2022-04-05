@@ -19,7 +19,7 @@ public class MessageRepositoryImpl implements MessageRepository {
     private final DSLContext dsl;
 
     @Override
-    public List<Message> findAllById(int id) {
+    public List<Message> findAllByAccountId(int id) {
         return dsl.select(MESSAGE.ID, MESSAGE.FROM_ACCOUNT_ID, MESSAGE.TO_ACCOUNT_ID, MESSAGE.TEXT, MESSAGE.DATE, MESSAGE.STATUS)
                 .from(MESSAGE)
                 .where(MESSAGE.FROM_ACCOUNT_ID.eq(id))
@@ -29,7 +29,7 @@ public class MessageRepositoryImpl implements MessageRepository {
     @Override
     public int insert(Message message) {
         return Objects.requireNonNull(dsl.insertInto(MESSAGE, MESSAGE.FROM_ACCOUNT_ID, MESSAGE.TO_ACCOUNT_ID, MESSAGE.DATE, MESSAGE.TEXT, MESSAGE.STATUS)
-                .values(message.getFromAccountId(), message.getToAccountId(), Timestamp.valueOf(LocalDateTime.now()), message.getText(), Status.NEW.toString())
+                .values(message.getFromAccountId(), message.getToAccountId(), Timestamp.valueOf(LocalDateTime.now()), message.getText(), message.getStatus().toString())
                 .returningResult(MESSAGE.ID).fetchOne()).get(MESSAGE.ID);
     }
 

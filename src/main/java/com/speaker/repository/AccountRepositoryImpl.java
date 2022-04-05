@@ -25,24 +25,15 @@ public class AccountRepositoryImpl implements AccountRepository {
     public List<Account> findAll() {
         return dsl.select(ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE,
                         COUNTRY.NAME, COUNTRY.ID,
-                        CITY.NAME, CITY.ID,
-                        FRIENDS.ACCOUNT_ID, FRIENDS.FRIEND_ACCOUNT_ID, FRIENDS.ID)
+                        CITY.NAME, CITY.ID)
                 .from(ACCOUNT)
                 .leftJoin(COUNTRY).on(ACCOUNT.COUNTRY_ID.eq(COUNTRY.ID))
                 .leftJoin(CITY).on(COUNTRY.ID.eq(CITY.COUNTRY_ID))
-                .leftJoin(FRIENDS).on(ACCOUNT.ID.eq(FRIENDS.ACCOUNT_ID))
                 .fetch()
                 .map(accountMapper::mapToAccount)
                 .stream()
-                .peek(account -> account.setMassages(messageRepository.findAllById(account.getId())))
+                .peek(account -> account.setMassages(messageRepository.findAllByAccountId(account.getId())))
                 .collect(toList());
-    }
-
-    public List<Account> findAllById(int id) {
-        return dsl.select(ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE)
-                .from(ACCOUNT)
-                .where(ACCOUNT.ID.eq(id))
-                .fetchInto(Account.class);
     }
 
     @Override

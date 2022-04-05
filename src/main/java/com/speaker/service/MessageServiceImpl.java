@@ -13,8 +13,8 @@ public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
 
     @Override
-    public List<Message> findAllById(int idAccount) {
-        return messageRepository.findAllById(idAccount);
+    public List<Message> getMessagesByAccountId(int accountId) {
+        return messageRepository.findAllByAccountId(accountId);
     }
 
     @Override
