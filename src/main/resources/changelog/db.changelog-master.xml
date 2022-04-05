@@ -41,7 +41,7 @@
                                  constraintName="fk_city_to_country"
                                  referencedTableName="country" referencedColumnNames="id"/>
 
-        <createTable tableName="fiends">
+        <createTable tableName="friends">
             <column autoIncrement="true" name="id" type="INTEGER">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -49,9 +49,9 @@
             <column name="friend_account_id" type="INTEGER"/>
         </createTable>
 
-        <addForeignKeyConstraint baseTableName="account" baseColumnNames="id"
-                                 constraintName="fk_account_to_friends"
-                                 referencedTableName="friends" referencedColumnNames="account_id"/>
+        <addForeignKeyConstraint baseTableName="friends" baseColumnNames="account_id"
+                                 constraintName="fk_friends_to_account"
+                                 referencedTableName="account" referencedColumnNames="id"/>
 
         <createTable tableName="message">
             <column autoIncrement="true" name="id" type="INTEGER">
