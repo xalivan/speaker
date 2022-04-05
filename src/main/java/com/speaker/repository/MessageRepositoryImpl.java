@@ -1,7 +1,6 @@
 package com.speaker.repository;
 
 import com.speaker.entities.Message;
-import com.speaker.entities.Status;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;

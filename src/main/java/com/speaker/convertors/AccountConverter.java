@@ -4,11 +4,9 @@ import com.speaker.dto.AccountDTO;
 import com.speaker.dto.CountryDTO;
 import com.speaker.entities.Account;
 import com.speaker.entities.City;
-import com.speaker.entities.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 

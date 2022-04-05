@@ -11,7 +11,6 @@ import java.util.List;
 import static com.speaker.db.jooq.generated.tables.Account.ACCOUNT;
 import static com.speaker.db.jooq.generated.tables.City.CITY;
 import static com.speaker.db.jooq.generated.tables.Country.COUNTRY;
-import static com.speaker.db.jooq.generated.tables.Friends.FRIENDS;
 import static java.util.stream.Collectors.toList;
 
 @Repository

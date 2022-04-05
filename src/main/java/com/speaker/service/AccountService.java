@@ -1,7 +1,6 @@
 package com.speaker.service;
 
 import com.speaker.dto.AccountDTO;
-import com.speaker.entities.Account;
 
 import java.util.List;
 

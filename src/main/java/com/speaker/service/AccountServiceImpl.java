@@ -2,7 +2,6 @@ package com.speaker.service;
 
 import com.speaker.convertors.AccountConverter;
 import com.speaker.dto.AccountDTO;
-import com.speaker.entities.Account;
 import com.speaker.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -21,7 +21,7 @@ public class MessageController {
         return ResponseEntity.ok(messageService.create(message));
     }
     @GetMapping
-    public List<Message> getMessagesByAccountId(int accountId) {
-        return messageService.getMessagesByAccountId(accountId);
+    public ResponseEntity<List<Message>> getMessagesByAccountId(int accountId) {
+        return ResponseEntity.ok(messageService.getMessagesByAccountId(accountId));
     }
 }
