@@ -2,6 +2,7 @@ package com.speaker.service;
 
 import com.speaker.convertors.AccountConverter;
 import com.speaker.dto.AccountDTO;
+import com.speaker.entities.Account;
 import com.speaker.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,11 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findAll().stream()
                 .map(accountConverter::convertToAccountDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Account> findAllFriendsByAccountId(int accountId) {
+        return accountRepository.findAllFriendsByAccountId(accountId);
     }
 
     @Override

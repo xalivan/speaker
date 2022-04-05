@@ -2,6 +2,7 @@ package com.speaker.controller;
 
 
 import com.speaker.dto.AccountDTO;
+import com.speaker.entities.Account;
 import com.speaker.service.AccountService;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +18,19 @@ import java.util.List;
 public class AccountController {
     private final AccountService accountService;
 
+
     @PostMapping
     public ResponseEntity<Integer> create(@RequestBody AccountDTO accountDTO) {
         return ResponseEntity.ok(accountService.create(accountDTO));
     }
 
     @GetMapping
-    public List<AccountDTO> getAll() {
-        return accountService.findAll();
+    public ResponseEntity<List<AccountDTO>> getAll() {
+        return ResponseEntity.ok(accountService.findAll());
+    }
+
+    @GetMapping("{accountId}")
+    public List<Account> getAllFriendsById(@PathVariable int accountId) {
+        return accountService.findAllFriendsByAccountId(accountId);
     }
 }

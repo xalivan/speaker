@@ -11,6 +11,7 @@ import java.util.List;
 import static com.speaker.db.jooq.generated.tables.Account.ACCOUNT;
 import static com.speaker.db.jooq.generated.tables.City.CITY;
 import static com.speaker.db.jooq.generated.tables.Country.COUNTRY;
+import static com.speaker.db.jooq.generated.tables.Friends.FRIENDS;
 import static java.util.stream.Collectors.toList;
 
 @Repository
@@ -33,6 +34,20 @@ public class AccountRepositoryImpl implements AccountRepository {
                 .stream()
                 .peek(account -> account.setMassages(messageRepository.findAllByAccountId(account.getId())))
                 .collect(toList());
+    }
+
+    public List<Account> findAllFriendsByAccountId(int accountId) {
+        return dsl.select(ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE,
+                        COUNTRY.NAME, COUNTRY.ID,
+                        CITY.NAME, CITY.ID,
+                        FRIENDS.ID)
+                .from(ACCOUNT)
+                .leftJoin(COUNTRY).on(ACCOUNT.COUNTRY_ID.eq(COUNTRY.ID))
+                .leftJoin(CITY).on(COUNTRY.ID.eq(CITY.COUNTRY_ID))
+                .leftJoin(FRIENDS).on(ACCOUNT.ID.eq(FRIENDS.FRIEND_ACCOUNT_ID))
+                .where(FRIENDS.ACCOUNT_ID.eq(accountId))
+                .fetch()
+                .map(accountMapper::mapToAccount);
     }
 
     @Override
