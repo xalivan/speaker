@@ -30,7 +30,7 @@ public class AccountController {
     }
 
     @GetMapping("{accountId}")
-    public List<Account> getAllFriendsById(@PathVariable int accountId) {
-        return accountService.findAllFriendsByAccountId(accountId);
+    public ResponseEntity<List<Account>> getAllFriendsById(@PathVariable int accountId) {
+        return ResponseEntity.ok(accountService.findAllFriendsByAccountId(accountId));
     }
 }
