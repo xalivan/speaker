@@ -32,6 +32,7 @@ public class AccountRepositoryImpl implements AccountRepository {
                 .fetch()
                 .map(accountMapper::mapToAccount)
                 .stream()
+                .peek(friends-> friends.setFriends(findAllFriendsByAccountId(friends.getId())))
                 .peek(account -> account.setMassages(messageRepository.findAllByAccountId(account.getId())))
                 .collect(toList());
     }
@@ -39,8 +40,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     public List<Account> findAllFriendsByAccountId(int accountId) {
         return dsl.select(ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE,
                         COUNTRY.NAME, COUNTRY.ID,
-                        CITY.NAME, CITY.ID,
-                        FRIENDS.ID)
+                        CITY.NAME, CITY.ID)
                 .from(ACCOUNT)
                 .leftJoin(COUNTRY).on(ACCOUNT.COUNTRY_ID.eq(COUNTRY.ID))
                 .leftJoin(CITY).on(COUNTRY.ID.eq(CITY.COUNTRY_ID))
