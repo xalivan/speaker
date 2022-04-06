@@ -65,4 +65,26 @@
         </createTable>
 
     </changeSet>
+
+    <changeSet author="Mazur" id="changelog-3.0">
+
+        <insert tableName="country">
+            <column name="id" value="1"/>
+            <column name="name" value="UKRAINE"/>
+        </insert>
+        <insert tableName="country">
+            <column name="id" value="2"/>
+            <column name="name" value="USA"/>
+        </insert>
+
+        <insert tableName="city">
+            <column name="name" value="KYIV"/>
+            <column name="country_id" value="1"/>
+        </insert>
+        <insert tableName="city">
+            <column name="name" value="NEW_YORK"/>
+            <column name="country_id" value="2"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

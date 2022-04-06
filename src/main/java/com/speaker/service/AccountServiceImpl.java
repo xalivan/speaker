@@ -29,7 +29,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public int create(AccountDTO accountDTO) {
-        return accountRepository.insert(accountConverter.convertToAccount(accountDTO));
+    public boolean create(AccountDTO accountDTO) {
+        return accountRepository.insert(accountConverter.convertToAccount(accountDTO))>0;
     }
 }

@@ -20,8 +20,8 @@ public class AccountController {
 
 
     @PostMapping
-    public ResponseEntity<Integer> create(@RequestBody AccountDTO accountDTO) {
-        return ResponseEntity.ok(accountService.create(accountDTO));
+    public ResponseEntity<Void> create(@RequestBody AccountDTO accountDTO) {
+        return accountService.create(accountDTO) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
     @GetMapping

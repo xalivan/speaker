@@ -1,13 +1,14 @@
 package com.speaker.convertors;
 
 import com.speaker.dto.AccountDTO;
+import com.speaker.dto.CityDTO;
 import com.speaker.dto.CountryDTO;
-import com.speaker.entities.Account;
-import com.speaker.entities.City;
-import com.speaker.entities.Country;
+import com.speaker.entities.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ public class AccountConverter {
                 .country(CountryDTO.builder()
                         .id(account.getCountry().getId())
                         .name(account.getCountry().getName())
-                        .city(City.builder()
+                        .cityDTO(CityDTO.builder()
                                 .id(account.getCountry().getCity().getId())
                                 .name(account.getCountry().getCity().getName())
                                 .build())
@@ -52,11 +53,33 @@ public class AccountConverter {
                 .country(convertToCountry(accountDTO.getCountry()))
                 .build();
     }
+
     public Country convertToCountry(CountryDTO countryDTO) {
         return Country.builder()
-                .id(countryDTO.getId())
+                .id(getCountryId(countryDTO))
                 .name(countryDTO.getName())
-                .city(countryDTO.getCity())
+                .city(convertToCity(countryDTO.getCityDTO()))
                 .build();
+    }
+
+    public City convertToCity(CityDTO cityDTO) {
+        return City.builder()
+                .id(getCityId(cityDTO))
+                .name(cityDTO.getName())
+                .build();
+    }
+
+    private int getCityId(CityDTO cityDTO) {
+        Map<CityName, Integer> cityMap = new HashMap<>();
+        cityMap.put(CityName.KYIV, 1);
+        cityMap.put(CityName.NEW_YORK, 2);
+        return cityMap.get(cityDTO.getName());
+    }
+
+    private int getCountryId(CountryDTO countryDTO) {
+        Map<CountryName, Integer> countryMap = new HashMap<>();
+        countryMap.put(CountryName.UKRAINE, 1);
+        countryMap.put(CountryName.USA, 2);
+        return countryMap.get(countryDTO.getName());
     }
 }

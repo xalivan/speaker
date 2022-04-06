@@ -10,5 +10,5 @@ public interface AccountService {
 
     List<Account> findAllFriendsByAccountId(int accountId);
 
-    int create(AccountDTO account);
+    boolean create(AccountDTO account);
 }

@@ -10,5 +10,5 @@ import lombok.Data;
 public class CountryDTO {
     private final int id;
     private final CountryName name;
-    private final City city;
+    private final CityDTO cityDTO;
 }
