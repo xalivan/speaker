@@ -4,6 +4,7 @@ import com.speaker.dto.AccountDTO;
 import com.speaker.dto.CountryDTO;
 import com.speaker.entities.Account;
 import com.speaker.entities.City;
+import com.speaker.entities.Country;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +49,14 @@ public class AccountConverter {
                 .name(accountDTO.getName())
                 .lastName(accountDTO.getLastName())
                 .age(accountDTO.getAge())
+                .country(convertToCountry(accountDTO.getCountry()))
+                .build();
+    }
+    public Country convertToCountry(CountryDTO countryDTO) {
+        return Country.builder()
+                .id(countryDTO.getId())
+                .name(countryDTO.getName())
+                .city(countryDTO.getCity())
                 .build();
     }
 }

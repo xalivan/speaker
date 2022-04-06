@@ -52,8 +52,10 @@ public class AccountRepositoryImpl implements AccountRepository {
 
     @Override
     public int insert(Account account) {
-        return dsl.insertInto(ACCOUNT, ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE)
-                .values(account.getId(), account.getName(), account.getLastName(), account.getAge())
+        return dsl.insertInto(ACCOUNT, ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME,
+                        ACCOUNT.AGE, ACCOUNT.COUNTRY_ID, ACCOUNT.CITY_ID)
+                .values(account.getId(), account.getName(), account.getLastName(),
+                        account.getAge(), account.getCountry().getId(), account.getCountry().getCity().getId())
                 .execute();
     }
 }
