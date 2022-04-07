@@ -63,11 +63,9 @@
             <column name="date" type="timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP"/>
             <column name="status" type="VARCHAR(255)"/>
         </createTable>
-
     </changeSet>
 
     <changeSet author="Mazur" id="changelog-3.0">
-
         <insert tableName="country">
             <column name="id" value="1"/>
             <column name="name" value="UKRAINE"/>
@@ -87,4 +85,14 @@
         </insert>
     </changeSet>
 
+    <changeSet author="Mazur" id="changelog-4.0">
+        <insert tableName="city">
+            <column name="name" value="VINNITSA"/>
+            <column name="country_id" value="1"/>
+        </insert>
+        <insert tableName="city">
+            <column name="name" value="OKLAND"/>
+            <column name="country_id" value="2"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

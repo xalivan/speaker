@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 @Service
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
@@ -30,6 +31,6 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean create(AccountDTO accountDTO) {
-        return accountRepository.insert(accountConverter.convertToAccount(accountDTO))>0;
+        return accountRepository.insert(accountConverter.convertToAccount(accountDTO)) > 0;
     }
 }

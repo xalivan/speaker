@@ -3,12 +3,14 @@ package com.speaker.convertors;
 import com.speaker.dto.AccountDTO;
 import com.speaker.dto.CityDTO;
 import com.speaker.dto.CountryDTO;
-import com.speaker.entities.*;
+import com.speaker.entities.Account;
+import com.speaker.entities.City;
+import com.speaker.entities.Country;
+import com.speaker.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountConverter {
     private final MessageConvertor messageConvertor;
+    private final AccountRepository accountRepository;
 
     public AccountDTO convertToAccountDTO(Account account) {
         return AccountDTO.builder()
@@ -50,36 +53,40 @@ public class AccountConverter {
                 .name(accountDTO.getName())
                 .lastName(accountDTO.getLastName())
                 .age(accountDTO.getAge())
-                .country(convertToCountry(accountDTO.getCountry()))
+                .country(convertToCountry(accountDTO.getCountry(), accountDTO))
                 .build();
     }
 
-    public Country convertToCountry(CountryDTO countryDTO) {
+    public Country convertToCountry(CountryDTO countryDTO, AccountDTO accountDTO) {
         return Country.builder()
-                .id(getCountryId(countryDTO))
+                .id(getCountryId(accountDTO))
                 .name(countryDTO.getName())
-                .city(convertToCity(countryDTO.getCityDTO()))
+                .city(convertToCity(countryDTO.getCityDTO(), accountDTO))
                 .build();
     }
 
-    public City convertToCity(CityDTO cityDTO) {
+    public City convertToCity(CityDTO cityDTO, AccountDTO accountDTO) {
         return City.builder()
-                .id(getCityId(cityDTO))
+                .id(getCityId(accountDTO))
                 .name(cityDTO.getName())
                 .build();
     }
 
-    private int getCityId(CityDTO cityDTO) {
-        Map<CityName, Integer> cityMap = new HashMap<>();
-        cityMap.put(CityName.KYIV, 1);
-        cityMap.put(CityName.NEW_YORK, 2);
-        return cityMap.get(cityDTO.getName());
+    private int getCityId(AccountDTO accountDTO) {
+        String cityName = accountDTO.getCountry().getCityDTO().getName().name();
+        return allCountryAndCity().stream()
+                .filter(country -> country.getCity().getName().name().equals(cityName))
+                .map(country -> country.getCity().getId()).findFirst().get();
     }
 
-    private int getCountryId(CountryDTO countryDTO) {
-        Map<CountryName, Integer> countryMap = new HashMap<>();
-        countryMap.put(CountryName.UKRAINE, 1);
-        countryMap.put(CountryName.USA, 2);
-        return countryMap.get(countryDTO.getName());
+    private int getCountryId(AccountDTO accountDTO) {
+        String countryName = accountDTO.getCountry().getName().name();
+        return allCountryAndCity().stream()
+                .filter(country -> country.getName().name().equals(countryName))
+                .map(Country::getId).findFirst().get();
+    }
+
+    private List<Country> allCountryAndCity() {
+        return accountRepository.findAllCountryAndCity();
     }
 }

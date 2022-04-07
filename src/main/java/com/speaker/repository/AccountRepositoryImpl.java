@@ -1,7 +1,9 @@
 package com.speaker.repository;
 
 import com.speaker.entities.Account;
+import com.speaker.entities.Country;
 import com.speaker.repository.mappers.AccountMapper;
+import com.speaker.repository.mappers.CountryMapper;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
@@ -19,6 +21,7 @@ import static java.util.stream.Collectors.toList;
 public class AccountRepositoryImpl implements AccountRepository {
     private final DSLContext dsl;
     private final AccountMapper accountMapper;
+    private final CountryMapper countryMapper;
     private final MessageRepository messageRepository;
 
     @Override
@@ -32,11 +35,12 @@ public class AccountRepositoryImpl implements AccountRepository {
                 .fetch()
                 .map(accountMapper::mapToAccount)
                 .stream()
-                .peek(friends-> friends.setFriends(findAllFriendsByAccountId(friends.getId())))
+                .peek(friends -> friends.setFriends(findAllFriendsByAccountId(friends.getId())))
                 .peek(account -> account.setMassages(messageRepository.findAllByAccountId(account.getId())))
                 .collect(toList());
     }
 
+    @Override
     public List<Account> findAllFriendsByAccountId(int accountId) {
         return dsl.select(ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE,
                         COUNTRY.NAME, COUNTRY.ID,
@@ -48,6 +52,16 @@ public class AccountRepositoryImpl implements AccountRepository {
                 .where(FRIENDS.ACCOUNT_ID.eq(accountId))
                 .fetch()
                 .map(accountMapper::mapToAccount);
+    }
+
+    @Override
+    public List<Country> findAllCountryAndCity() {
+        return dsl.select(COUNTRY.NAME, COUNTRY.ID,
+                        CITY.NAME, CITY.ID)
+                .from(COUNTRY)
+                .leftJoin(CITY).on(COUNTRY.ID.eq(CITY.COUNTRY_ID))
+                .fetch()
+                .map(countryMapper::mapToCountry);
     }
 
     @Override
