@@ -4,14 +4,13 @@ import com.speaker.convertors.AccountConverter;
 import com.speaker.dto.AccountDTO;
 import com.speaker.entities.*;
 import com.speaker.repository.AccountRepository;
-import liquibase.pro.packaged.A;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 
@@ -35,39 +34,34 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean create(AccountDTO accountDTO) {
+        Map<CityName, Pair<Integer, Integer>> cityNamePairMap = getAllCountryAndCity().get(accountDTO.getCountry().getName());
+        Pair<Integer, Integer> integerIntegerPair = cityNamePairMap.get(accountDTO.getCountry().getCityDTO().getName());
+        return accountRepository.insert(accountConverter
+                .convertToAccount(accountDTO, integerIntegerPair.getFirst(), integerIntegerPair.getSecond())) > 0;
+    }
+
+    @PostConstruct
+    private Map<CountryName, Map<CityName, Pair<Integer, Integer>>> getAllCountryAndCity() {
         List<Country> allCountryAndCity = accountRepository.findAllCountryAndCity();
-        Map<CountryName, List<Pair>> map = allCountryAndCity.stream()
-                .map(country -> new Pair<CountryName, Integer, Pair>(country.getName(), country.getId(), new Pair<CityName, Integer, City>(country.getCity().getName(), country.getId(), country.getCity())))
-                .collect(Collectors.groupingBy(Pair::getName, Collectors.mapping(Pair::getObject, Collectors.toList())));
-        int countryId = getCountryId(accountDTO, map);
-        List<Pair> pairs = map.get(accountDTO.getCountry().getName());
-        int cityId = getCityId(pairs, accountDTO);
-        return accountRepository.insert(accountConverter.convertToAccount(accountDTO, countryId, cityId)) > 0;
+        return allCountryAndCity.stream()
+                .map(country -> new Pair<CountryName, Pair<CityName, Pair<Integer, City>>>(country.getName(),
+                        new Pair<CityName, Pair<Integer, City>>(country.getCity().getName(),
+                                new Pair<Integer, City>(country.getId(), country.getCity()))
+                )).collect(Collectors.groupingBy(Pair::getFirst, Collectors.mapping(Pair::getSecond, Collectors.toMap(Pair::getFirst, this::convertToIds, (city1, city2) -> city1))));
+    }
+
+    private Pair<Integer, Integer> convertToIds(Pair<CityName, Pair<Integer, City>> entry) {
+        return new Pair<>(entry.getSecond().getFirst(), entry.getSecond().getSecond().getId());
     }
 
     @Data
-    class Pair<A, B, C> {
-        private A name;
-        private B id;
-        private C object;
+    class Pair<A, B> {
+        private A first;
+        private B second;
 
-        public Pair(A name, B id, C object) {
-            this.name = name;
-            this.id = id;
-            this.object = object;
+        public Pair(A first, B second) {
+            this.first = first;
+            this.second = second;
         }
-    }
-
-    private int getCountryId(AccountDTO accountDTO, Map<CountryName, List<Pair>> map) {
-        return map.get(accountDTO.getCountry().getName()).stream()
-                .filter(country -> country.getName().equals(accountDTO.getCountry().getCityDTO().getName()))
-                .mapToInt(country -> (Integer) country.getId()).findFirst().getAsInt();
-    }
-
-    private int getCityId(List<Pair> pairs, AccountDTO accountDTO) {
-        List<City> cityList = pairs.stream()
-                .filter(pair -> pair.getName().equals(accountDTO.getCountry().getCityDTO().getName()))
-                .map(pair -> (City) pair.getObject()).collect(Collectors.toList());
-        return cityList.stream().mapToInt(City::getId).findFirst().getAsInt();
     }
 }
