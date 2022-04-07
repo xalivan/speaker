@@ -10,7 +10,6 @@ import com.speaker.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,45 +47,29 @@ public class AccountConverter {
     }
 
 
-    public Account convertToAccount(AccountDTO accountDTO) {
+    public Account convertToAccount(AccountDTO accountDTO, int countryId, int cityId) {
         return Account.builder()
                 .name(accountDTO.getName())
                 .lastName(accountDTO.getLastName())
                 .age(accountDTO.getAge())
-                .country(convertToCountry(accountDTO.getCountry(), accountDTO))
+                .country(convertToCountry(accountDTO.getCountry(), countryId, cityId))
                 .build();
     }
 
-    public Country convertToCountry(CountryDTO countryDTO, AccountDTO accountDTO) {
+    public Country convertToCountry(CountryDTO countryDTO, int countryId, int cityId) {
         return Country.builder()
-                .id(getCountryId(accountDTO))
+                .id(countryId)
                 .name(countryDTO.getName())
-                .city(convertToCity(countryDTO.getCityDTO(), accountDTO))
+                .city(convertToCity(countryDTO.getCityDTO(), cityId))
                 .build();
     }
 
-    public City convertToCity(CityDTO cityDTO, AccountDTO accountDTO) {
+    public City convertToCity(CityDTO cityDTO, int cityId) {
         return City.builder()
-                .id(getCityId(accountDTO))
+                .id(cityId)
                 .name(cityDTO.getName())
                 .build();
     }
 
-    private int getCityId(AccountDTO accountDTO) {
-        String cityName = accountDTO.getCountry().getCityDTO().getName().name();
-        return allCountryAndCity().stream()
-                .filter(country -> country.getCity().getName().name().equals(cityName))
-                .map(country -> country.getCity().getId()).findFirst().get();
-    }
 
-    private int getCountryId(AccountDTO accountDTO) {
-        String countryName = accountDTO.getCountry().getName().name();
-        return allCountryAndCity().stream()
-                .filter(country -> country.getName().name().equals(countryName))
-                .map(Country::getId).findFirst().get();
-    }
-
-    private List<Country> allCountryAndCity() {
-        return accountRepository.findAllCountryAndCity();
-    }
 }
