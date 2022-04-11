@@ -64,34 +64,30 @@ class AccountServiceImplTest {
         when(accountConverter.convertToAccount(accountDTO, accountDTO.getCountry().getId(),
                 accountDTO.getCountry().getCityDTO().getId())).thenReturn(account);
         when(accountRepository.insert(account)).thenReturn(1);
-        assertThat(accountService.create(accountDTO), is(true));
+        assertThat(accountService.create(accountDTO), is(Response.TRUE));
     }
 
     @Test
     void createIfCountryNull() {
         AccountDTO accountDTO = generateAccountDTO(null, CountryName.UKRAINE, "present", CityName.KYIV);
-        Throwable thrown = catchThrowable(() -> accountService.create(accountDTO));
-        assertThat(thrown.getClass(), is(NullPointerException.class));
+        assertThat(accountService.create(accountDTO), is(Response.FALSE));
     }
 
     @Test
     void createIfCountryNameNull() {
-        AccountDTO accountDTO2 = generateAccountDTO("present", null, "present", CityName.KYIV);
-        Throwable thrown2 = catchThrowable(() -> accountService.create(accountDTO2));
-        assertThat(thrown2.getClass(), is(NullPointerException.class));
+        AccountDTO accountDTO = generateAccountDTO("present", null, "present", CityName.KYIV);
+        assertThat(accountService.create(accountDTO), is(Response.FALSE));
     }
 
     @Test
     void createIfCityNull() {
-        AccountDTO accountDTO3 = generateAccountDTO("present", CountryName.UKRAINE, null, CityName.KYIV);
-        Throwable thrown3 = catchThrowable(() -> accountService.create(accountDTO3));
-        assertThat(thrown3.getClass(), is(NullPointerException.class));
+        AccountDTO accountDTO = generateAccountDTO("present", CountryName.UKRAINE, null, CityName.KYIV);
+        assertThat(accountService.create(accountDTO), is(Response.FALSE));
     }
 
-    @Test
+    @Test()
     void createIfCityNameNull() {
-        AccountDTO accountDTO4 = generateAccountDTO("present", CountryName.UKRAINE, "present", null);
-        Throwable thrown4 = catchThrowable(() -> accountService.create(accountDTO4));
-        assertThat(thrown4.getClass(), is(NullPointerException.class));
+        AccountDTO accountDTO = generateAccountDTO("present", CountryName.UKRAINE, "present", null);
+        assertThat(accountService.create(accountDTO), is(Response.FALSE));
     }
 }

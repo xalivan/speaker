@@ -4,6 +4,7 @@ package com.speaker.controller;
 import com.speaker.dto.AccountDTO;
 import com.speaker.entities.Account;
 import com.speaker.service.AccountService;
+import com.speaker.service.Response;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,8 @@ public class AccountController {
 
 
     @PostMapping
-    public ResponseEntity<Void> create(@RequestBody AccountDTO accountDTO) {
-        return accountService.create(accountDTO) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    public Response create(@RequestBody AccountDTO accountDTO) {
+        return accountService.create(accountDTO).equals(Response.TRUE) ? Response.TRUE : Response.FALSE;
     }
 
     @GetMapping
