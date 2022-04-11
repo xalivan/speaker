@@ -6,7 +6,6 @@ import com.speaker.dto.CountryDTO;
 import com.speaker.entities.Account;
 import com.speaker.entities.City;
 import com.speaker.entities.Country;
-import com.speaker.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountConverter {
     private final MessageConvertor messageConvertor;
-    private final AccountRepository accountRepository;
 
     public AccountDTO convertToAccountDTO(Account account) {
         return AccountDTO.builder()
