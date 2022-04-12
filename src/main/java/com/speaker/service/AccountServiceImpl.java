@@ -9,7 +9,8 @@ import com.speaker.entities.City;
 import com.speaker.entities.CityName;
 import com.speaker.entities.CountryName;
 import com.speaker.repository.AccountRepository;
-import lombok.Data;
+import com.speaker.service.util.Pair;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.nonNull;
 
 @Service
-@Data
+@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
     private Map<CountryName, Map<CityName, Pair<Integer, Integer>>> mapCountryAndCity;
     private final AccountRepository accountRepository;
@@ -51,7 +52,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Response create(AccountDTO accountDTO) {
         CountryDTO countryDTO = accountDTO.getCountry();
-        if (nonNull(countryDTO) && nonNull(countryDTO.getName())) {
+        if (nonNull(accountDTO.getCountry()) && nonNull(countryDTO.getName())) {
             Map<CityName, Pair<Integer, Integer>> cityNamePairMap = mapCountryAndCity.get(countryDTO.getName());
             CityDTO cityDTO = countryDTO.getCityDTO();
             if (nonNull(cityDTO) && nonNull(cityDTO.getName())) {
@@ -66,16 +67,5 @@ public class AccountServiceImpl implements AccountService {
 
     private Pair<Integer, Integer> convertToIds(Pair<CityName, Pair<Integer, City>> entry) {
         return new Pair<>(entry.getSecond().getFirst(), entry.getSecond().getSecond().getId());
-    }
-
-    @Data
-    class Pair<A, B> {
-        private A first;
-        private B second;
-
-        public Pair(A first, B second) {
-            this.first = first;
-            this.second = second;
-        }
     }
 }
