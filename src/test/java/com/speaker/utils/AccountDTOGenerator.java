@@ -32,7 +32,6 @@ public class AccountDTOGenerator {
                         .map(cityDTO -> generateCityDTO(city.getName()))
                         .orElse(null))
                 .build();
-
     }
 
     public static CityDTO generateCityDTO(CityName cityName) {
