@@ -1,9 +1,9 @@
 package com.speaker.convertors;
 
 import com.speaker.dto.AccountDTO;
+import com.speaker.dto.CityDTO;
 import com.speaker.dto.CountryDTO;
 import com.speaker.entities.Account;
-import com.speaker.entities.City;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountConverter {
     private final MessageConvertor messageConvertor;
+    private final CountryConverter countryConverter;
 
     public AccountDTO convertToAccountDTO(Account account) {
         return AccountDTO.builder()
@@ -24,7 +25,7 @@ public class AccountConverter {
                 .country(CountryDTO.builder()
                         .id(account.getCountry().getId())
                         .name(account.getCountry().getName())
-                        .city(City.builder()
+                        .cityDTO(CityDTO.builder()
                                 .id(account.getCountry().getCity().getId())
                                 .name(account.getCountry().getCity().getName())
                                 .build())
@@ -43,11 +44,14 @@ public class AccountConverter {
     }
 
 
-    public Account convertToAccount(AccountDTO accountDTO) {
+    public Account convertToAccount(AccountDTO accountDTO, int countryId, int cityId) {
         return Account.builder()
                 .name(accountDTO.getName())
                 .lastName(accountDTO.getLastName())
                 .age(accountDTO.getAge())
+                .country(countryConverter.convertToCountry(accountDTO.getCountry(), countryId, cityId))
                 .build();
     }
+
+
 }

@@ -2,11 +2,13 @@ package com.speaker.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Data
 @Builder
+@RequiredArgsConstructor
 public class AccountDTO {
     private final int id;
     private final String name;

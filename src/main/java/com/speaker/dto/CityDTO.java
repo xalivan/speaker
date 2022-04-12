@@ -1,5 +1,6 @@
-package com.speaker.entities;
+package com.speaker.dto;
 
+import com.speaker.entities.CityName;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -7,8 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 @Builder
 @RequiredArgsConstructor
-public class Country {
+public class CityDTO {
     private final int id;
-    private final CountryName name;
-    private final City city;
+    private final CityName name;
 }
