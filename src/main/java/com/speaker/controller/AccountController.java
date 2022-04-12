@@ -22,7 +22,7 @@ public class AccountController {
 
     @PostMapping
     public Response create(@RequestBody AccountDTO accountDTO) {
-        return accountService.create(accountDTO).equals(Response.TRUE) ? Response.TRUE : Response.FALSE;
+        return accountService.create(accountDTO);
     }
 
     @GetMapping
