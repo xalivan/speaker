@@ -6,45 +6,33 @@ import com.speaker.dto.CountryDTO;
 import com.speaker.entities.CityName;
 import com.speaker.entities.CountryName;
 
+import java.util.Optional;
 import java.util.Random;
 
 public class AccountDTOGenerator {
     private final static Random RANDOM = new Random();
 
     public static AccountDTO generateAccountDTO(CountryDTO country) {
-        if (country == null) {
-            return AccountDTO.builder()
-                    .id(RANDOM.nextInt(10))
-                    .name("Ivan")
-                    .lastName("Mazur")
-                    .age(RANDOM.nextInt(10))
-                    .country(null)
-                    .build();
-        } else {
-            return AccountDTO.builder()
-                    .id(RANDOM.nextInt(10))
-                    .name("Ivan")
-                    .lastName("Mazur")
-                    .age(RANDOM.nextInt(10))
-                    .country(generateCountryDTO(country.getName(), country.getCityDTO()))
-                    .build();
-        }
+        return AccountDTO.builder()
+                .id(RANDOM.nextInt(10))
+                .name("Ivan")
+                .lastName("Mazur")
+                .age(RANDOM.nextInt(10))
+                .country(Optional.ofNullable(country)
+                        .map(countryDTO -> generateCountryDTO(countryDTO.getName(), countryDTO.getCityDTO()))
+                        .orElse(null))
+                .build();
     }
 
     public static CountryDTO generateCountryDTO(CountryName countryName, CityDTO city) {
-        if (city == null) {
-            return CountryDTO.builder()
-                    .id(1)
-                    .name(countryName)
-                    .cityDTO(null)
-                    .build();
-        } else {
-            return CountryDTO.builder()
-                    .id(1)
-                    .name(countryName)
-                    .cityDTO(generateCityDTO(city.getName()))
-                    .build();
-        }
+        return CountryDTO.builder()
+                .id(1)
+                .name(countryName)
+                .cityDTO(Optional.ofNullable(city)
+                        .map(cityDTO -> generateCityDTO(city.getName()))
+                        .orElse(null))
+                .build();
+
     }
 
     public static CityDTO generateCityDTO(CityName cityName) {

@@ -18,7 +18,6 @@ import java.util.List;
 import static com.speaker.utils.AccountDTOGenerator.*;
 import static com.speaker.utils.AccountGenerator.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 
@@ -43,10 +42,10 @@ class AccountServiceImplTest {
     @Test
     public void findAllAccounts() {
         Account account = generateAccount(generateCountry(CountryName.UKRAINE, generateCity(CityName.KYIV)));
-        when(accountConverter.convertToAccountDTO(account))
-                .thenReturn(generateAccountDTO(generateCountryDTO(CountryName.UKRAINE, generateCityDTO(CityName.KYIV))));
         when(accountRepository.findAll()).thenReturn(List.of(account));
-        assertThat(accountService.findAll(), containsInAnyOrder(accountConverter.convertToAccountDTO(account)));
+        AccountDTO accountDTO = generateAccountDTO(generateCountryDTO(CountryName.UKRAINE, generateCityDTO(CityName.KYIV)));
+        when(accountConverter.convertToAccountDTO(account)).thenReturn(accountDTO);
+        assertThat(accountService.findAll(), is(List.of(accountDTO)));
     }
 
     @Test
@@ -84,7 +83,7 @@ class AccountServiceImplTest {
         assertThat(accountService.create(accountDTO), is(Response.FALSE));
     }
 
-    @Test()
+    @Test
     public void accountNotCreatedWhenCityNameIsNull() {
         AccountDTO accountDTO = generateAccountDTO(generateCountryDTO(CountryName.UKRAINE, generateCityDTO(null)));
         assertThat(accountService.create(accountDTO), is(Response.FALSE));
