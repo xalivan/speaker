@@ -45,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
     public Response addFriend(FriendDTO friendDTO) {
         Optional<Integer> accountId = convertFirstAndLastNameToId(friendDTO.getAccountFirstLastNames());
         Optional<Integer> friendId = convertFirstAndLastNameToId(friendDTO.getFriendFirstLastNames());
-        if (nonNull(accountId) && nonNull(friendId) && accountId.isPresent() && friendId.isPresent()) {
+        if (accountId.isPresent() && friendId.isPresent()) {
             accountRepository.addFriend(friendConverter.convertToFriend(accountId.get(), friendId.get()));
             return Response.TRUE;
         }
@@ -75,11 +75,12 @@ public class AccountServiceImpl implements AccountService {
         return Response.FALSE;
     }
 
-
     private Optional<Integer> convertFirstAndLastNameToId(String names) {
-        String[] splitNames = names.split("\\s");
-        if (splitNames.length == 2) {
-            return accountRepository.findAccountIdByNameAndLastName(splitNames[0], splitNames[1]);
+        if (nonNull(names)) {
+            String[] splitNames = names.trim().split("\\s+");
+            if (splitNames.length == 2) {
+                return accountRepository.findAccountIdByNameAndLastName(splitNames[0], splitNames[1]);
+            }
         }
         return Optional.empty();
     }
