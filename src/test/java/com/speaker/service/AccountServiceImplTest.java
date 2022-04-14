@@ -34,14 +34,12 @@ class AccountServiceImplTest {
     private static final String ACCOUNT_FIRST_LAST_NAME = ACCOUNT_FIRST_NAME + SEPARATOR + LAST_NAME;
     private static final String FRIEND_FIRST_NAME = "Victor";
     private static final String FRIEND_FIRST_LAST_NAME = FRIEND_FIRST_NAME + SEPARATOR + LAST_NAME;
-    private static final String FRIEND_FIRST_LAST_NAME_WITH_SPACES = SEPARATOR + SEPARATOR + FRIEND_FIRST_NAME
-            + SEPARATOR + SEPARATOR + LAST_NAME + SEPARATOR + SEPARATOR;
-    private static final String ACCOUNT_FIRST_LAST_NAME_WITH_SPACES = SEPARATOR + SEPARATOR + ACCOUNT_FIRST_NAME
-            + SEPARATOR + SEPARATOR + LAST_NAME + SEPARATOR + SEPARATOR;
-    private static final String ACCOUNT_WITH_THREE_FIRST_NAMES= "Ivan Mazur Mazur";
+    private static final String FRIEND_FIRST_LAST_NAME_WITH_SPACES = "  " + FRIEND_FIRST_NAME + "  " + LAST_NAME + "  ";
+    private static final String ACCOUNT_FIRST_LAST_NAME_WITH_SPACES = "  " + ACCOUNT_FIRST_NAME + "  " + LAST_NAME + "  ";
+    private static final String ACCOUNT_WITH_THREE_FIRST_NAMES = "Ivan Mazur Mazur";
     private static final int NUMBER_INSERTED_RECORDS = 1;
-    private static final int ACCOUNT_ID_ONE = 1;
-    private static final int FRIEND_ID_TWO = 2;
+    private static final int ACCOUNT_ID = 1;
+    private static final int FRIEND_ID = 2;
 
     @Mock
     private FriendConverter friendConverter;
@@ -72,8 +70,8 @@ class AccountServiceImplTest {
     @Test
     public void findAllFriendsByAccountId() {
         Account account = generateAccount(generateCountry(CountryName.UKRAINE, generateCity(CityName.KYIV)));
-        when(accountRepository.findAllFriendsByAccountId(ACCOUNT_ID_ONE)).thenReturn(List.of(account));
-        assertThat(accountService.findAllFriendsByAccountId(ACCOUNT_ID_ONE), is(List.of(account)));
+        when(accountRepository.findAllFriendsByAccountId(ACCOUNT_ID)).thenReturn(List.of(account));
+        assertThat(accountService.findAllFriendsByAccountId(ACCOUNT_ID), is(List.of(account)));
     }
 
     @Test
@@ -114,9 +112,9 @@ class AccountServiceImplTest {
     public void addFriendSuccess() {
         FriendDTO friendDTO = generateFriendDTO(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
         Friend friend = generateFriend();
-        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID_ONE));
-        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID_TWO));
-        when(friendConverter.convertToFriend(ACCOUNT_ID_ONE, FRIEND_ID_TWO)).thenReturn(friend);
+        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID));
+        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID));
+        when(friendConverter.convertToFriend(ACCOUNT_ID, FRIEND_ID)).thenReturn(friend);
         when(accountRepository.addFriend(friend)).thenReturn(NUMBER_INSERTED_RECORDS);
         assertThat(accountService.addFriend(friendDTO), is(Response.TRUE));
     }
@@ -125,9 +123,9 @@ class AccountServiceImplTest {
     public void addFriendSuccessWithSpaces() {
         FriendDTO friendDTO = generateFriendDTO(ACCOUNT_FIRST_LAST_NAME_WITH_SPACES, FRIEND_FIRST_LAST_NAME_WITH_SPACES);
         Friend friend = generateFriend();
-        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID_ONE));
-        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID_TWO));
-        when(friendConverter.convertToFriend(ACCOUNT_ID_ONE, FRIEND_ID_TWO)).thenReturn(friend);
+        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID));
+        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID));
+        when(friendConverter.convertToFriend(ACCOUNT_ID, FRIEND_ID)).thenReturn(friend);
         when(accountRepository.addFriend(friend)).thenReturn(NUMBER_INSERTED_RECORDS);
         assertThat(accountService.addFriend(friendDTO), is(Response.TRUE));
     }
@@ -156,11 +154,11 @@ class AccountServiceImplTest {
     }
 
     private Friend generateFriend() {
-       final Random RANDOM = new Random();
+        final Random RANDOM = new Random();
         return Friend.builder()
                 .id(RANDOM.nextInt(10))
-                .accountId(ACCOUNT_ID_ONE)
-                .friendAccountId(FRIEND_ID_TWO)
+                .accountId(ACCOUNT_ID)
+                .friendAccountId(FRIEND_ID)
                 .build();
     }
 
