@@ -1,17 +1,17 @@
 package com.speaker.convertors;
 
 
-import com.speaker.entities.Friends;
+import com.speaker.entities.Friend;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class FriendConverter {
-    public Friends convertToFriends(int accountId1, int accountId2) {
-        return Friends.builder()
-                .accountId(accountId1)
-                .friendAccountId(accountId2)
+    public Friend convertToFriend(int accountId, int friendId) {
+        return Friend.builder()
+                .accountId(accountId)
+                .friendAccountId(friendId)
                 .build();
 
     }

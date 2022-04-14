@@ -2,7 +2,7 @@ package com.speaker.controller;
 
 
 import com.speaker.dto.AccountDTO;
-import com.speaker.dto.FriendsDTO;
+import com.speaker.dto.FriendDTO;
 import com.speaker.entities.Account;
 import com.speaker.service.AccountService;
 import com.speaker.service.Response;
@@ -36,8 +36,8 @@ public class AccountController {
         return ResponseEntity.ok(accountService.findAllFriendsByAccountId(accountId));
     }
 
-    @PostMapping("add-friends")
-    public ResponseEntity<Response> addFriends(@RequestBody FriendsDTO friendsDTO) {
-        return ResponseEntity.ok(accountService.addFriends(friendsDTO));
+    @PostMapping("add/friends")
+    public ResponseEntity<Response> addFriend(@RequestBody FriendDTO friendDTO) {
+        return ResponseEntity.ok(accountService.addFriend(friendDTO));
     }
 }

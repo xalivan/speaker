@@ -1,7 +1,7 @@
 package com.speaker.service;
 
 import com.speaker.dto.AccountDTO;
-import com.speaker.dto.FriendsDTO;
+import com.speaker.dto.FriendDTO;
 import com.speaker.entities.Account;
 
 import java.util.List;
@@ -13,5 +13,5 @@ public interface AccountService {
 
     Response create(AccountDTO account);
 
-    Response addFriends(FriendsDTO friendsDTO);
+    Response addFriend(FriendDTO friendDTO);
 }

@@ -2,7 +2,7 @@ package com.speaker.repository;
 
 import com.speaker.entities.Account;
 import com.speaker.entities.Country;
-import com.speaker.entities.Friends;
+import com.speaker.entities.Friend;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +16,7 @@ public interface AccountRepository {
 
     int insert(Account account);
 
-    int addFriends(Friends friends);
+    int addFriend(Friend friend);
 
-    Optional<Account> findAccountByNameAndLastName(String name, String lastName);
+    Optional<Integer> findAccountIdByNameAndLastName(String name, String lastName);
 }

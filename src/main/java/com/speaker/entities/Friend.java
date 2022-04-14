@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class Friends {
+public class Friend {
     private final int id;
     private final int accountId;
     private final int friendAccountId;

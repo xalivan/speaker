@@ -5,7 +5,7 @@ import com.speaker.convertors.FriendConverter;
 import com.speaker.dto.AccountDTO;
 import com.speaker.dto.CityDTO;
 import com.speaker.dto.CountryDTO;
-import com.speaker.dto.FriendsDTO;
+import com.speaker.dto.FriendDTO;
 import com.speaker.entities.*;
 import com.speaker.repository.AccountRepository;
 import com.speaker.service.util.Pair;
@@ -13,9 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -44,33 +42,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Response addFriends(FriendsDTO friendsDTO) {
-        if (nonNull(friendsDTO.getNameUser1()) && nonNull(friendsDTO.getNameUser2())) {
-            List<String[]> stringList = parsStringList(List.of(friendsDTO.getNameUser1(), friendsDTO.getNameUser2()));
-            List<Optional<Account>> optionalList = stringList.stream()
-                    .filter(str -> str.length == 2)
-                    .map(str -> accountRepository.findAccountByNameAndLastName(str[0], str[1])).collect(Collectors.toList());
-            Friends friends = convertToFriends(optionalList);
-            if (nonNull(friends)) {
-                accountRepository.addFriends(friends);
-                return Response.TRUE;
-            }
+    public Response addFriend(FriendDTO friendDTO) {
+        Optional<Integer> accountId = convertFirstAndLastNameToId(friendDTO.getAccountFirstLastNames());
+        Optional<Integer> friendId = convertFirstAndLastNameToId(friendDTO.getFriendFirstLastNames());
+        if (nonNull(accountId) && nonNull(friendId) && accountId.isPresent() && friendId.isPresent()) {
+            accountRepository.addFriend(friendConverter.convertToFriend(accountId.get(), friendId.get()));
+            return Response.TRUE;
         }
         return Response.FALSE;
-    }
-
-    private List<String[]> parsStringList(List<String> strings) {
-        return strings.stream()
-                .map(str -> str.split("\\s")).collect(Collectors.toList());
-    }
-
-    private Friends convertToFriends(List<Optional<Account>> optionalList) {
-        if (optionalList.get(0).isPresent() && optionalList.get(1).isPresent()) {
-            return Optional.of(optionalList)
-                    .map(account -> friendConverter.convertToFriends(account.get(0).get().getId(),
-                            account.get(1).get().getId())).orElse(null);
-        }
-        return null;
     }
 
     @Override
@@ -96,6 +75,14 @@ public class AccountServiceImpl implements AccountService {
         return Response.FALSE;
     }
 
+
+    private Optional<Integer> convertFirstAndLastNameToId(String names) {
+        String[] splitNames = names.split("\\s");
+        if (splitNames.length == 2) {
+            return accountRepository.findAccountIdByNameAndLastName(splitNames[0], splitNames[1]);
+        }
+        return Optional.empty();
+    }
 
     private Pair<Integer, Integer> convertToIds(Pair<CityName, Pair<Integer, City>> entry) {
         return new Pair<>(entry.getSecond().getFirst(), entry.getSecond().getSecond().getId());

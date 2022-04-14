@@ -2,7 +2,7 @@ package com.speaker.repository;
 
 import com.speaker.entities.Account;
 import com.speaker.entities.Country;
-import com.speaker.entities.Friends;
+import com.speaker.entities.Friend;
 import com.speaker.repository.mappers.AccountMapper;
 import com.speaker.repository.mappers.CountryMapper;
 import lombok.RequiredArgsConstructor;
@@ -27,22 +27,17 @@ public class AccountRepositoryImpl implements AccountRepository {
     private final MessageRepository messageRepository;
 
     @Override
-    public Optional<Account> findAccountByNameAndLastName(String name, String lastName) {
-        return dsl.select(ACCOUNT.ID, ACCOUNT.NAME, ACCOUNT.LAST_NAME, ACCOUNT.AGE,
-                        COUNTRY.NAME, COUNTRY.ID,
-                        CITY.NAME, CITY.ID)
+    public Optional<Integer> findAccountIdByNameAndLastName(String name, String lastName) {
+        return dsl.select(ACCOUNT.ID)
                 .from(ACCOUNT)
-                .leftJoin(COUNTRY).on(ACCOUNT.COUNTRY_ID.eq(COUNTRY.ID))
-                .leftJoin(CITY).on(COUNTRY.ID.eq(CITY.COUNTRY_ID))
                 .where(ACCOUNT.NAME.equal(name).and(ACCOUNT.LAST_NAME.eq(lastName)))
-                .fetch()
-                .map(accountMapper::mapToAccount).stream().distinct().findFirst();
+                .fetchOptionalInto(Integer.class);
     }
 
     @Override
-    public int addFriends(Friends friends) {
+    public int addFriend(Friend friend) {
         return dsl.insertInto(FRIENDS, FRIENDS.ID, FRIENDS.ACCOUNT_ID, FRIENDS.FRIEND_ACCOUNT_ID)
-                .values(friends.getId(), friends.getAccountId(), friends.getFriendAccountId())
+                .values(friend.getId(), friend.getAccountId(), friend.getFriendAccountId())
                 .execute();
     }
 
