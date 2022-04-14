@@ -21,14 +21,17 @@ import java.util.Optional;
 
 import static com.speaker.utils.AccountDTOGenerator.*;
 import static com.speaker.utils.AccountGenerator.*;
-import static com.speaker.utils.FriendDTOGenerator.generateFriendDTO;
-import static com.speaker.utils.FriendGenerator.generateFriend;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceImplTest {
+    final String IVAN_MAZUR = "Ivan Mazur";
+    final String VICTOR_MAZUR = "Victor Mazur";
+    final String IVAN = "Ivan";
+    final String MAZUR = "Mazur";
+    final String VICTOR = "Victor";
     @Mock
     private FriendConverter friendConverter;
     @Mock
@@ -98,10 +101,16 @@ class AccountServiceImplTest {
 
     @Test
     public void addFriendSuccess() {
-        FriendDTO friendDTO = generateFriendDTO("Ivan Mazur", "Victor Mazur");
-        Friend friend = generateFriend(1, 2);
-        when(accountRepository.findAccountIdByNameAndLastName("Ivan", "Mazur")).thenReturn(Optional.of(1));
-        when(accountRepository.findAccountIdByNameAndLastName("Victor", "Mazur")).thenReturn(Optional.of(2));
+        FriendDTO friendDTO = FriendDTO.builder()
+                .accountFirstLastNames(IVAN_MAZUR)
+                .friendFirstLastNames(VICTOR_MAZUR)
+                .build();
+        Friend friend = Friend.builder()
+                .friendAccountId(1)
+                .friendAccountId(2)
+                .build();
+        when(accountRepository.findAccountIdByNameAndLastName(IVAN, MAZUR)).thenReturn(Optional.of(1));
+        when(accountRepository.findAccountIdByNameAndLastName(VICTOR, MAZUR)).thenReturn(Optional.of(2));
         when(friendConverter.convertToFriend(1, 2)).thenReturn(friend);
         when(accountRepository.addFriend(friend)).thenReturn(1);
         assertThat(accountService.addFriend(friendDTO), is(Response.TRUE));
@@ -109,35 +118,50 @@ class AccountServiceImplTest {
 
     @Test
     public void addFriendSuccessWithSpaces() {
-        FriendDTO friendDTO = generateFriendDTO("  Ivan   Mazur  ", " Victor  Mazur  ");
-        Friend friend = generateFriend(1, 2);
-        when(accountRepository.findAccountIdByNameAndLastName("Ivan", "Mazur")).thenReturn(Optional.of(1));
-        when(accountRepository.findAccountIdByNameAndLastName("Victor", "Mazur")).thenReturn(Optional.of(2));
+        FriendDTO friendDTO = FriendDTO.builder()
+                .accountFirstLastNames("  Ivan   Mazur  ")
+                .friendFirstLastNames(" Victor  Mazur  ")
+                .build();
+        Friend friend = Friend.builder()
+                .friendAccountId(1)
+                .friendAccountId(2)
+                .build();
+        when(accountRepository.findAccountIdByNameAndLastName(IVAN, MAZUR)).thenReturn(Optional.of(1));
+        when(accountRepository.findAccountIdByNameAndLastName(VICTOR, MAZUR)).thenReturn(Optional.of(2));
         when(friendConverter.convertToFriend(1, 2)).thenReturn(friend);
         when(accountRepository.addFriend(friend)).thenReturn(1);
         assertThat(accountService.addFriend(friendDTO), is(Response.TRUE));
     }
 
     @Test
-    public void addFriendWhenAccountNameNull() {
-        FriendDTO friendDTO = generateFriendDTO(null, "Victor Mazur");
+    public void friendNotCreatedWhenAccountNameIsNull() {
+        FriendDTO friendDTO = FriendDTO.builder()
+                .accountFirstLastNames(null)
+                .accountFirstLastNames(VICTOR_MAZUR)
+                .build();
         assertThat(accountService.addFriend(friendDTO), is(Response.FALSE));
     }
 
     @Test
-    public void FriendNotCreatedWhenAccountNameHasThreeWord() {
-        FriendDTO friendDTO = generateFriendDTO("Ivan Mazur Mazur", "Victor Mazur");
+    public void friendNotCreatedWhenAccountNamesHasThreeFirstNames() {
+        FriendDTO friendDTO = FriendDTO.builder()
+                .accountFirstLastNames("Ivan Mazur Mazur")
+                .accountFirstLastNames(VICTOR_MAZUR)
+                .build();
         assertThat(accountService.addFriend(friendDTO), is(Response.FALSE));
-        verify(accountRepository).findAccountIdByNameAndLastName("Victor", "Mazur");
+        verify(accountRepository).findAccountIdByNameAndLastName(VICTOR, MAZUR);
         verify(accountRepository, never()).addFriend(any(Friend.class));
     }
 
     @Test
-    public void FriendNotCreatedWhenAccountNameHasOneWord() {
-        FriendDTO friendDTO = generateFriendDTO("Ivan", "Victor Mazur");
+    public void friendNotCreatedWhenAccountNamesHasOnlyFirstName() {
+        FriendDTO friendDTO = FriendDTO.builder()
+                .accountFirstLastNames(IVAN)
+                .accountFirstLastNames(VICTOR_MAZUR)
+                .build();
         assertThat(accountService.addFriend(friendDTO), is(Response.FALSE));
-        verify(accountRepository, never()).findAccountIdByNameAndLastName("Ivan", null);
-        verify(accountRepository).findAccountIdByNameAndLastName("Victor", "Mazur");
+        verify(accountRepository, never()).findAccountIdByNameAndLastName(IVAN, null);
+        verify(accountRepository).findAccountIdByNameAndLastName(VICTOR, MAZUR);
         verify(accountRepository, never()).addFriend(any(Friend.class));
     }
 }
