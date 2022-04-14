@@ -2,6 +2,7 @@ package com.speaker.controller;
 
 
 import com.speaker.dto.AccountDTO;
+import com.speaker.dto.FriendDTO;
 import com.speaker.entities.Account;
 import com.speaker.service.AccountService;
 import com.speaker.service.Response;
@@ -33,5 +34,10 @@ public class AccountController {
     @GetMapping("{accountId}")
     public ResponseEntity<List<Account>> getAllFriendsById(@PathVariable int accountId) {
         return ResponseEntity.ok(accountService.findAllFriendsByAccountId(accountId));
+    }
+
+    @PostMapping("add/friends")
+    public ResponseEntity<Response> addFriend(@RequestBody FriendDTO friendDTO) {
+        return ResponseEntity.ok(accountService.addFriend(friendDTO));
     }
 }
