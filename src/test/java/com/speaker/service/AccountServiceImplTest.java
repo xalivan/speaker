@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import static com.speaker.utils.AccountDTOGenerator.*;
 import static com.speaker.utils.AccountGenerator.*;
@@ -29,9 +30,18 @@ import static org.mockito.Mockito.*;
 class AccountServiceImplTest {
     private static final String ACCOUNT_FIRST_NAME = "Ivan";
     private static final String LAST_NAME = "Mazur";
-    private static final String ACCOUNT_FIRST_LAST_NAME = ACCOUNT_FIRST_NAME + " " + LAST_NAME;
+    private static final String SEPARATOR = " ";
+    private static final String ACCOUNT_FIRST_LAST_NAME = ACCOUNT_FIRST_NAME + SEPARATOR + LAST_NAME;
     private static final String FRIEND_FIRST_NAME = "Victor";
-    private static final String FRIEND_FIRST_LAST_NAME = FRIEND_FIRST_NAME + " " + LAST_NAME;
+    private static final String FRIEND_FIRST_LAST_NAME = FRIEND_FIRST_NAME + SEPARATOR + LAST_NAME;
+    private static final String FRIEND_FIRST_LAST_NAME_WITH_SPACES = SEPARATOR + SEPARATOR + FRIEND_FIRST_NAME
+            + SEPARATOR + SEPARATOR + LAST_NAME + SEPARATOR + SEPARATOR;
+    private static final String ACCOUNT_FIRST_LAST_NAME_WITH_SPACES = SEPARATOR + SEPARATOR + ACCOUNT_FIRST_NAME
+            + SEPARATOR + SEPARATOR + LAST_NAME + SEPARATOR + SEPARATOR;
+    private static final String ACCOUNT_WITH_THREE_FIRST_NAMES= "Ivan Mazur Mazur";
+    private static final int NUMBER_INSERTED_RECORDS = 1;
+    private static final int ACCOUNT_ID_ONE = 1;
+    private static final int FRIEND_ID_TWO = 2;
 
     @Mock
     private FriendConverter friendConverter;
@@ -62,8 +72,8 @@ class AccountServiceImplTest {
     @Test
     public void findAllFriendsByAccountId() {
         Account account = generateAccount(generateCountry(CountryName.UKRAINE, generateCity(CityName.KYIV)));
-        when(accountRepository.findAllFriendsByAccountId(1)).thenReturn(List.of(account));
-        assertThat(accountService.findAllFriendsByAccountId(1), is(List.of(account)));
+        when(accountRepository.findAllFriendsByAccountId(ACCOUNT_ID_ONE)).thenReturn(List.of(account));
+        assertThat(accountService.findAllFriendsByAccountId(ACCOUNT_ID_ONE), is(List.of(account)));
     }
 
     @Test
@@ -72,7 +82,7 @@ class AccountServiceImplTest {
         AccountDTO accountDTO = generateAccountDTO(generateCountryDTO(CountryName.UKRAINE, generateCityDTO(CityName.KYIV)));
         when(accountConverter.convertToAccount(accountDTO, accountDTO.getCountry().getId(),
                 accountDTO.getCountry().getCityDTO().getId())).thenReturn(account);
-        when(accountRepository.insert(account)).thenReturn(1);
+        when(accountRepository.insert(account)).thenReturn(NUMBER_INSERTED_RECORDS);
         assertThat(accountService.create(accountDTO), is(Response.TRUE));
     }
 
@@ -104,21 +114,21 @@ class AccountServiceImplTest {
     public void addFriendSuccess() {
         FriendDTO friendDTO = generateFriendDTO(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
         Friend friend = generateFriend();
-        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(1));
-        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(2));
-        when(friendConverter.convertToFriend(1, 2)).thenReturn(friend);
-        when(accountRepository.addFriend(friend)).thenReturn(1);
+        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID_ONE));
+        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID_TWO));
+        when(friendConverter.convertToFriend(ACCOUNT_ID_ONE, FRIEND_ID_TWO)).thenReturn(friend);
+        when(accountRepository.addFriend(friend)).thenReturn(NUMBER_INSERTED_RECORDS);
         assertThat(accountService.addFriend(friendDTO), is(Response.TRUE));
     }
 
     @Test
     public void addFriendSuccessWithSpaces() {
-        FriendDTO friendDTO = generateFriendDTO("  Ivan   Mazur  ", " Victor  Mazur  ");
+        FriendDTO friendDTO = generateFriendDTO(ACCOUNT_FIRST_LAST_NAME_WITH_SPACES, FRIEND_FIRST_LAST_NAME_WITH_SPACES);
         Friend friend = generateFriend();
-        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(1));
-        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(2));
-        when(friendConverter.convertToFriend(1, 2)).thenReturn(friend);
-        when(accountRepository.addFriend(friend)).thenReturn(1);
+        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID_ONE));
+        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID_TWO));
+        when(friendConverter.convertToFriend(ACCOUNT_ID_ONE, FRIEND_ID_TWO)).thenReturn(friend);
+        when(accountRepository.addFriend(friend)).thenReturn(NUMBER_INSERTED_RECORDS);
         assertThat(accountService.addFriend(friendDTO), is(Response.TRUE));
     }
 
@@ -130,7 +140,7 @@ class AccountServiceImplTest {
 
     @Test
     public void friendNotCreatedWhenAccountNamesHasThreeFirstNames() {
-        FriendDTO friendDTO = generateFriendDTO("Ivan Mazur Mazur", FRIEND_FIRST_LAST_NAME);
+        FriendDTO friendDTO = generateFriendDTO(ACCOUNT_WITH_THREE_FIRST_NAMES, FRIEND_FIRST_LAST_NAME);
         assertThat(accountService.addFriend(friendDTO), is(Response.FALSE));
         verify(accountRepository).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
         verify(accountRepository, never()).addFriend(any(Friend.class));
@@ -146,10 +156,11 @@ class AccountServiceImplTest {
     }
 
     private Friend generateFriend() {
+       final Random RANDOM = new Random();
         return Friend.builder()
-                .id(1)
-                .accountId(1)
-                .friendAccountId(2)
+                .id(RANDOM.nextInt(10))
+                .accountId(ACCOUNT_ID_ONE)
+                .friendAccountId(FRIEND_ID_TWO)
                 .build();
     }
 
