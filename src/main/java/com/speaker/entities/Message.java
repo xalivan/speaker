@@ -1,5 +1,6 @@
 package com.speaker.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
+@AllArgsConstructor
 public class Message {
     private final int id;
     private final int fromAccountId;
