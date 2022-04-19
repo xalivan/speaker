@@ -24,7 +24,9 @@ import static org.mockito.Mockito.*;
 class MessageServiceImplTest {
     private static final int ACCOUNT_ID = 1;
     private static final int FRIEND_ID = 2;
-    private static final Optional<List<Integer>> MESSAGE_ID = Optional.of(List.of(23));
+    private static final int INDEX_0 = 0;
+    private static final int INDEX_1 = 1;
+    private static final boolean INSERT_TRUE = true;
     private static final String ACCOUNT_FIRST_NAME = "Ivan";
     private static final String LAST_NAME = "Mazur";
     private static final String SEPARATOR = " ";
@@ -53,8 +55,9 @@ class MessageServiceImplTest {
         List<MessageDTO> messageDTO = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
         when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID));
         when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID));
-        when(messageConvertor.convertToMessageList(messageDTO, Optional.of(FRIEND_ID), Optional.of(ACCOUNT_ID))).thenReturn(message);
-        when(messageRepository.insert(message)).thenReturn(MESSAGE_ID);
+        when(messageConvertor.convertToMessage(messageDTO.get(INDEX_0), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_0));
+        when(messageConvertor.convertToMessage(messageDTO.get(1), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_1));
+        when(messageRepository.createMessages(message)).thenReturn(INSERT_TRUE);
         assertThat(messageService.addMessage(messageDTO), is(Response.TRUE));
     }
 
@@ -65,10 +68,11 @@ class MessageServiceImplTest {
         when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.empty());
         when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID));
         assertThat(messageService.addMessage(messageDTO), is(Response.FALSE));
-        verify(accountRepository).findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME);
-        verify(accountRepository).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
-        verify(messageConvertor, never()).convertToMessage(messageDTO.get(0), null, FRIEND_ID);
-        verify(messageRepository, never()).insert(message);
+        verify(accountRepository, times(2)).findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME);
+        verify(accountRepository, times(2)).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
+        verify(messageConvertor, never()).convertToMessage(messageDTO.get(INDEX_0), null, FRIEND_ID);
+        verify(messageConvertor, never()).convertToMessage(messageDTO.get(INDEX_1), null, FRIEND_ID);
+        verify(messageRepository, never()).createMessages(message);
     }
 
     @Test
@@ -77,32 +81,51 @@ class MessageServiceImplTest {
         List<Message> message = generateMessageList();
         assertThat(messageService.addMessage(messageDTO), is(Response.FALSE));
         verify(accountRepository, never()).findAccountIdByNameAndLastName(null, null);
-        verify(accountRepository, never()).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
-        verify(messageConvertor, never()).convertToMessage(messageDTO.get(0), null, FRIEND_ID);
-        verify(messageRepository, never()).insert(message);
+        verify(accountRepository, times(2)).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
+        verify(messageConvertor, never()).convertToMessage(messageDTO.get(INDEX_0), null, FRIEND_ID);
+        verify(messageConvertor, never()).convertToMessage(messageDTO.get(INDEX_1), null, FRIEND_ID);
+        verify(messageRepository, never()).createMessages(message);
     }
 
     private List<Message> generateMessageList() {
         return List.of(Message.builder()
-                .id(23)
-                .fromAccountId(ACCOUNT_ID)
-                .toAccountId(FRIEND_ID)
-                .text("text")
-                .date(LocalDateTime.now())
-                .status(Status.NEW)
-                .build());
+                        .id(5)
+                        .fromAccountId(ACCOUNT_ID)
+                        .toAccountId(FRIEND_ID)
+                        .text("text 1")
+                        .date(LocalDateTime.now())
+                        .status(Status.NEW)
+                        .build(),
+                Message.builder()
+                        .id(6)
+                        .fromAccountId(ACCOUNT_ID)
+                        .toAccountId(FRIEND_ID)
+                        .text("text 2")
+                        .date(LocalDateTime.now())
+                        .status(Status.READ)
+                        .build());
     }
 
     private List<MessageDTO> generateMessageDTOList(String accountName, String friendName) {
         return List.of(MessageDTO.builder()
-                .id(23)
-                .fromAccountId(ACCOUNT_ID)
-                .toAccountId(FRIEND_ID)
-                .text("text")
-                .date(LocalDateTime.now())
-                .status(Status.NEW)
-                .fromAccountNames(accountName)
-                .toAccountNames(friendName)
-                .build());
+                        .id(5)
+                        .fromAccountId(ACCOUNT_ID)
+                        .toAccountId(FRIEND_ID)
+                        .text("text 1")
+                        .date(LocalDateTime.now())
+                        .status(Status.NEW)
+                        .fromAccountNames(accountName)
+                        .toAccountNames(friendName)
+                        .build(),
+                MessageDTO.builder()
+                        .id(6)
+                        .fromAccountId(ACCOUNT_ID)
+                        .toAccountId(FRIEND_ID)
+                        .text("text 2")
+                        .date(LocalDateTime.now())
+                        .status(Status.READ)
+                        .fromAccountNames(accountName)
+                        .toAccountNames(friendName)
+                        .build());
     }
 }

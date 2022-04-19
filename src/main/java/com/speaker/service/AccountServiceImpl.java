@@ -12,6 +12,7 @@ import com.speaker.entities.CityName;
 import com.speaker.entities.CountryName;
 import com.speaker.repository.AccountRepository;
 import com.speaker.service.util.Pair;
+import com.speaker.service.util.StringParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -81,13 +82,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Optional<Integer> convertFirstAndLastNameToId(String names) {
-        if (nonNull(names)) {
-            String[] splitNames = names.trim().split("\\s+");
-            if (splitNames.length == 2) {
-                return accountRepository.findAccountIdByNameAndLastName(splitNames[0], splitNames[1]);
-            }
-        }
-        return Optional.empty();
+        return StringParser.splitBySpace(names)
+                .flatMap(pair -> accountRepository.findAccountIdByNameAndLastName(pair.getFirst(), pair.getSecond()));
     }
 
     private Pair<Integer, Integer> convertToIds(Pair<CityName, Pair<Integer, City>> entry) {

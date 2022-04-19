@@ -5,14 +5,16 @@ import com.speaker.dto.MessageDTO;
 import com.speaker.entities.Message;
 import com.speaker.repository.AccountRepository;
 import com.speaker.repository.MessageRepository;
-import com.speaker.service.util.Pair;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static com.speaker.service.util.StringParser.parseOptionalStringBySpace;
+import static com.speaker.service.util.StringParser.splitBySpace;
+
 
 @Service
 @RequiredArgsConstructor
@@ -27,25 +29,32 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Response addMessage(List<MessageDTO> messageDTO) {
-        for (MessageDTO message : messageDTO) {
-            if (parseOptionalStringBySpace(message.getToAccountNames()).isPresent()
-                    && parseOptionalStringBySpace(message.getFromAccountNames()).isPresent()
-                    && !messageDTO.isEmpty()) {
-                if (messageRepository.insert(
-                        messageConvertor.convertToMessageList(
-                                messageDTO,
-                                findAccountByNames(parseOptionalStringBySpace(message.getToAccountNames())),
-                                findAccountByNames(parseOptionalStringBySpace(message.getFromAccountNames())))).isPresent()) {
-                    return Response.TRUE;
-                }
-            }
+    public Response addMessage(List<MessageDTO> messageDTOs) {
+        List<Message> messages = messageDTOs.stream()
+                .map(this::convertToMessage)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (messageDTOs.size() == messages.size()) {
+            return messageRepository.createMessages(messages) ? Response.TRUE : Response.FALSE;
         }
         return Response.FALSE;
     }
 
-    private Optional<Integer> findAccountByNames(Optional<Pair<String, String>> names) {
-        return names.map(name -> accountRepository.findAccountIdByNameAndLastName(name.getFirst(), name.getSecond()))
-                .orElse(Optional.empty());
+    private Message convertToMessage(MessageDTO messageDTO) {
+        Optional<Integer> accountId = findAccountByNames(messageDTO.getToAccountNames());
+        Optional<Integer> friendId = findAccountByNames(messageDTO.getFromAccountNames());
+        if (accountId.isPresent() && friendId.isPresent()) {
+            return messageConvertor.convertToMessage(
+                    messageDTO,
+                    accountId.get(),
+                    friendId.get());
+        }
+        return null;
+    }
+
+    private Optional<Integer> findAccountByNames(String names) {
+        return splitBySpace(names)
+                .flatMap(name ->
+                        accountRepository.findAccountIdByNameAndLastName(name.getFirst(), name.getSecond()));
     }
 }
