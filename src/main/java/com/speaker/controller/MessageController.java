@@ -1,6 +1,7 @@
 package com.speaker.controller;
 
 import com.speaker.dto.MessageDTO;
+import com.speaker.dto.ValidatorError;
 import com.speaker.entities.Message;
 import com.speaker.service.MessageService;
 import com.speaker.service.Response;
@@ -24,7 +25,7 @@ public class MessageController {
     }
 
     @PostMapping("add/messages")
-    public ResponseEntity<Response> addFriendMassages(@RequestBody List<MessageDTO> messageDTO) {
+    public ResponseEntity<List<ValidatorError>> addFriendMassages(@RequestBody List<MessageDTO> messageDTO) {
         return ResponseEntity.ok(messageService.addMessage(messageDTO));
     }
 }
