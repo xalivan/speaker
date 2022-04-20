@@ -43,14 +43,14 @@ class MessageServiceImplTest {
     private MessageServiceImpl messageService;
 
     @Test
-    void getMessagesByAccountIdSuccess() {
+    public void getMessagesByAccountIdSuccess() {
         List<Message> messages = generateMessageList();
         when(messageRepository.findAllByAccountId(ACCOUNT_ID)).thenReturn(messages);
         assertThat(messageService.getMessagesByAccountId(ACCOUNT_ID), is(messages));
     }
 
     @Test
-    void addingMessageSuccess() {
+    public void createdMessageSuccess() {
         List<Message> message = generateMessageList();
         List<MessageDTO> messageDTO = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
         when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID));
@@ -62,29 +62,20 @@ class MessageServiceImplTest {
     }
 
     @Test
-    void messageNotAddingWhenAccountIdIsNull() {
+    public void  messageNotCreatedWhenAccountIdIsNull() {
         List<MessageDTO> messageDTO = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
-        List<Message> message = generateMessageList();
         when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.empty());
         when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID));
         assertThat(messageService.addMessage(messageDTO), is(Response.FALSE));
         verify(accountRepository, times(2)).findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME);
         verify(accountRepository, times(2)).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
-        verify(messageConvertor, never()).convertToMessage(messageDTO.get(INDEX_0), null, FRIEND_ID);
-        verify(messageConvertor, never()).convertToMessage(messageDTO.get(INDEX_1), null, FRIEND_ID);
-        verify(messageRepository, never()).createMessages(message);
     }
 
     @Test
-    void messageNotAddingWhenAccountNameIsNull() {
+    public void messageNotCreatedWhenAccountNameIsNull() {
         List<MessageDTO> messageDTO = generateMessageDTOList(null, FRIEND_FIRST_LAST_NAME);
-        List<Message> message = generateMessageList();
         assertThat(messageService.addMessage(messageDTO), is(Response.FALSE));
-        verify(accountRepository, never()).findAccountIdByNameAndLastName(null, null);
         verify(accountRepository, times(2)).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
-        verify(messageConvertor, never()).convertToMessage(messageDTO.get(INDEX_0), null, FRIEND_ID);
-        verify(messageConvertor, never()).convertToMessage(messageDTO.get(INDEX_1), null, FRIEND_ID);
-        verify(messageRepository, never()).createMessages(message);
     }
 
     private List<Message> generateMessageList() {
