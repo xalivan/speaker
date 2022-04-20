@@ -17,4 +17,6 @@ public class MessageDTO {
     private final String text;
     private final LocalDateTime date;
     private final Status status;
+    private final String fromAccountNames;
+    private final String toAccountNames;
 }

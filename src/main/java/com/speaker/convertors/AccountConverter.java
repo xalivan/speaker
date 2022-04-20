@@ -37,7 +37,7 @@ public class AccountConverter {
                         .orElse(null))
                 .massages(Optional.ofNullable(account.getMassages())
                         .map(message -> message.stream()
-                                .map(messageConvertor::convertTo)
+                                .map(messageConvertor::convertToMessageDTO)
                                 .collect(Collectors.toList()))
                         .orElse(null))
                 .build();

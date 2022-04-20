@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface MessageRepository {
     List<Message> findAllByAccountId(int id);
-    int insert(Message message);
+
+    boolean createMessages(List<Message> message);
 }

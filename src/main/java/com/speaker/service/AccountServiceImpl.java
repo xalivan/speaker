@@ -6,14 +6,20 @@ import com.speaker.dto.AccountDTO;
 import com.speaker.dto.CityDTO;
 import com.speaker.dto.CountryDTO;
 import com.speaker.dto.FriendDTO;
-import com.speaker.entities.*;
+import com.speaker.entities.Account;
+import com.speaker.entities.City;
+import com.speaker.entities.CityName;
+import com.speaker.entities.CountryName;
 import com.speaker.repository.AccountRepository;
 import com.speaker.service.util.Pair;
+import com.speaker.service.util.StringParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -66,9 +72,9 @@ public class AccountServiceImpl implements AccountService {
             Map<CityName, Pair<Integer, Integer>> cityNamePairMap = mapCountryAndCity.get(countryDTO.getName());
             CityDTO cityDTO = countryDTO.getCityDTO();
             if (nonNull(cityDTO) && nonNull(cityDTO.getName())) {
-                Pair<Integer, Integer> integerIntegerPair = cityNamePairMap.get(cityDTO.getName());
+                Pair<Integer, Integer> pairIdCountryAndIdCity = cityNamePairMap.get(cityDTO.getName());
                 accountRepository.insert(accountConverter
-                        .convertToAccount(accountDTO, integerIntegerPair.getFirst(), integerIntegerPair.getSecond()));
+                        .convertToAccount(accountDTO, pairIdCountryAndIdCity.getFirst(), pairIdCountryAndIdCity.getSecond()));
                 return Response.TRUE;
             }
         }
@@ -76,13 +82,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private Optional<Integer> convertFirstAndLastNameToId(String names) {
-        if (nonNull(names)) {
-            String[] splitNames = names.trim().split("\\s+");
-            if (splitNames.length == 2) {
-                return accountRepository.findAccountIdByNameAndLastName(splitNames[0], splitNames[1]);
-            }
-        }
-        return Optional.empty();
+        return StringParser.splitBySpace(names)
+                .flatMap(pair -> accountRepository.findAccountIdByNameAndLastName(pair.getFirst(), pair.getSecond()));
     }
 
     private Pair<Integer, Integer> convertToIds(Pair<CityName, Pair<Integer, City>> entry) {

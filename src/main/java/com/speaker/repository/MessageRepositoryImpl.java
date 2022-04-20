@@ -7,8 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.speaker.db.jooq.generated.tables.Message.MESSAGE;
 
@@ -26,10 +27,15 @@ public class MessageRepositoryImpl implements MessageRepository {
     }
 
     @Override
-    public int insert(Message message) {
-        return Objects.requireNonNull(dsl.insertInto(MESSAGE, MESSAGE.FROM_ACCOUNT_ID, MESSAGE.TO_ACCOUNT_ID, MESSAGE.DATE, MESSAGE.TEXT, MESSAGE.STATUS)
-                .values(message.getFromAccountId(), message.getToAccountId(), Timestamp.valueOf(LocalDateTime.now()), message.getText(), message.getStatus().toString())
-                .returningResult(MESSAGE.ID).fetchOne()).get(MESSAGE.ID);
+    public boolean createMessages(List<Message> messageList) {
+        int sum = Arrays.stream(dsl.batch(messageList.stream()
+                        .map(message -> dsl.insertInto(MESSAGE,
+                                        MESSAGE.FROM_ACCOUNT_ID, MESSAGE.TO_ACCOUNT_ID,
+                                        MESSAGE.DATE, MESSAGE.TEXT, MESSAGE.STATUS)
+                                .values(message.getFromAccountId(), message.getToAccountId(),
+                                        Timestamp.valueOf(LocalDateTime.now()), message.getText(), message.getStatus().toString()))
+                        .collect(Collectors.toList())).execute())
+                .sum();
+        return sum == messageList.size() && sum > 0;
     }
-
 }
