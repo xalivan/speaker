@@ -8,7 +8,6 @@ import com.speaker.service.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import java.util.List;
 import java.util.Objects;
@@ -16,10 +15,9 @@ import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
-public class ValidatorConfiguration<T, E> {
-    private final List<Validator<MessageDTO, String>> messageValidators;
-    private final List<Validator<AccountDTO, String>> accountValidators;
-    private final Validator<T, E> validator;
+public class ValidatorConfiguration {
+    private final List<Validator<MessageDTO>> messageValidators;
+    private final List<Validator<AccountDTO>> accountValidators;
 
     @Bean
     public FieldValidators<MessageDTO> messageDTOValidators() {
@@ -29,13 +27,6 @@ public class ValidatorConfiguration<T, E> {
                 return validateEntity(messageValidators, entity);
             }
         };
-    }
-
-    private <T, E> List<ValidatorError> validateEntity(List<Validator<T, E>> validatorList, T entity) {
-        return validatorList.stream()
-                .map(validator -> validator.validate(validator.getField(entity).get()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
     }
 
     @Bean
@@ -48,5 +39,10 @@ public class ValidatorConfiguration<T, E> {
         };
     }
 
-
+    private <T> List<ValidatorError> validateEntity(List<Validator<T>> validatorList, T entity) {
+        return validatorList.stream()
+                .map(validator -> validator.validate(validator.getField(entity)))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 }

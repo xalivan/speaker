@@ -6,8 +6,8 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum ErrorType {
-    EMPTY(" :is empty"),
-    NOT_FOUND(" :not found"),
-    NOT_VALID(" :is not valid");
+    EMPTY("Field is empty"),
+    NOT_FOUND("Field not found"),
+    NOT_VALID("Field is not valid");
     private final String error;
 }

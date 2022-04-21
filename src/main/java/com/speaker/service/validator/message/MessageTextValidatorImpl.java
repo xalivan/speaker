@@ -2,31 +2,35 @@ package com.speaker.service.validator.message;
 
 import com.speaker.dto.MessageDTO;
 import com.speaker.dto.ValidatorError;
+import com.speaker.entities.EntityField;
+import com.speaker.service.validator.AbstractValidator;
+import com.speaker.service.validator.Validator;
 import com.speaker.service.validator.type.ErrorType;
 import com.speaker.service.validator.type.FieldType;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Supplier;
+import static java.util.Objects.isNull;
 
 @Component
-@Qualifier("messageTextValidatorImpl")
-public class MessageTextValidatorImpl extends AbstractMessageCheckValidator {
-
+public class MessageTextValidatorImpl extends AbstractValidator implements Validator<MessageDTO> {
     @Override
-    public ValidatorError validate(String message) {
-        if (checkOrNull(message)) {
-            return ValidatorError.builder()
-                    .message(FieldType.TEXT.getField()+ ErrorType.EMPTY.getError())
-                    .field(FieldType.TEXT.getField())
-                    .build();
+    public ValidatorError validate(EntityField entityField) {
+        if (isNull(entityField.getField().toString())) {
+            return createValidatorError(ErrorType.EMPTY);
+        }
+        if (entityField.getField().equals("")) {
+            return createValidatorError(ErrorType.NOT_VALID);
         }
         return null;
     }
 
     @Override
-    public Supplier<String> getField(MessageDTO messageDTO) {
-        return messageDTO::getText;
+    public EntityField getField(MessageDTO messageDTO) {
+        return new EntityField(messageDTO.getText());
     }
 
+    @Override
+    protected FieldType getType() {
+        return FieldType.TEXT;
+    }
 }

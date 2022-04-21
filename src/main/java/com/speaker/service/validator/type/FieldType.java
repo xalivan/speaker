@@ -14,5 +14,5 @@ public enum FieldType {
     DATE("date"),
     FROM_ACCOUNT_NAMES("fromAccountNames"),
     TO_ACCOUNT_NAMES("toAccountNames");
-    private final String field;
+    private final String fieldName;
 }

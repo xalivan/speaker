@@ -1,11 +1,10 @@
 package com.speaker.service.validator;
 
 import com.speaker.dto.ValidatorError;
+import com.speaker.entities.EntityField;
 
-import java.util.function.Supplier;
+public interface Validator<T> {
+    ValidatorError validate(EntityField field);
 
-public interface Validator<T, E> {
-    ValidatorError validate(E entity);
-
-    Supplier<E> getField(T t);
+    EntityField getField(T entity);
 }

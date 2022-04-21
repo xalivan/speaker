@@ -2,45 +2,45 @@ package com.speaker.service.validator.message;
 
 import com.speaker.dto.MessageDTO;
 import com.speaker.dto.ValidatorError;
+import com.speaker.entities.EntityField;
+import com.speaker.service.validator.AbstractValidator;
+import com.speaker.service.validator.Validator;
 import com.speaker.service.validator.type.ErrorType;
 import com.speaker.service.validator.type.FieldType;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Supplier;
+import static java.util.Objects.isNull;
 
 @Component
-@Qualifier("messageFromAccountIdValidatorImpl")
-public class MessageFromAccountIdValidatorImpl extends AbstractMessageCheckValidator {
+public class MessageFromAccountIdValidatorImpl extends AbstractValidator implements Validator<MessageDTO> {
 
     @Override
-    public ValidatorError validate(String data) {
-        if (checkOrNull(data)) {
-            return ValidatorError.builder()
-                    .message(FieldType.FROM_ACCOUNT_ID.getField() + ErrorType.EMPTY.getError())
-                    .field(FieldType.FROM_ACCOUNT_ID.getField())
-                    .build();
+    public ValidatorError validate(EntityField entityField) {
+        if (isNull(entityField.getField().toString())) {
+            return createValidatorError(ErrorType.EMPTY);
         }
-        if (parsToInt(data) >= 0) {
-            return ValidatorError.builder()
-                    .message(FieldType.FROM_ACCOUNT_ID.getField() + ErrorType.NOT_VALID.getError())
-                    .field(FieldType.FROM_ACCOUNT_ID.getField())
-                    .build();
+        if (!parseToInt(entityField)) {
+            return createValidatorError(ErrorType.NOT_VALID);
+        }
+        if ((int) entityField.getField() < 0) {
+            return createValidatorError(ErrorType.NOT_VALID);
         }
         return null;
     }
 
     @Override
-    public Supplier<String> getField(MessageDTO messageDTO) {
-        return () -> convertToString(messageDTO.getFromAccountId());
+    public EntityField getField(MessageDTO messageDTO) {
+        return new EntityField(messageDTO.getFromAccountId());
     }
 
-    private String convertToString(int fromAccountId) {
-        return String.valueOf(fromAccountId);
+
+    @Override
+    protected FieldType getType() {
+        return FieldType.FROM_ACCOUNT_ID;
     }
 
-    private int parsToInt(String id) {
-        return Integer.parseInt(id);
+    private boolean parseToInt(EntityField entityField) {
+        String isInteger = entityField.getField().toString();
+        return isInteger.matches("[+]?\\d+");
     }
-
 }
