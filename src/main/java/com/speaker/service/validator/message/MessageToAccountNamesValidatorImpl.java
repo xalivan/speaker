@@ -11,10 +11,6 @@ import com.speaker.service.validator.type.FieldType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import static com.speaker.service.util.StringParser.splitBySpace;
 import static java.util.Objects.isNull;
 
@@ -27,35 +23,23 @@ public class MessageToAccountNamesValidatorImpl extends AbstractValidator implem
     public ValidatorError validate(EntityField entityField) {
         Object fieldName = entityField.getField();
         if (isNull(fieldName)) {
-            return createValidatorError(ErrorType.EMPTY);
+            return createValidatorError(ErrorType.EMPTY, entityField);
         }
         if (splitBySpace(fieldName.toString()).isEmpty()) {
-            return createValidatorError(ErrorType.NOT_VALID);
+            return createValidatorError(ErrorType.NOT_VALID, entityField);
         }
         if (findAccountByNames(fieldName.toString())) {
-            return createValidatorError(ErrorType.NOT_FOUND);
+            return createValidatorError(ErrorType.NOT_FOUND, entityField);
         }
         return null;
     }
 
     @Override
-    public List<ValidatorError> validateList(List<EntityField> entityFields) {
-        return entityFields.stream()
-                .map(this::validate)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    @Override
     public EntityField getField(MessageDTO messageDTO) {
-        return new EntityField(messageDTO.getToAccountNames());
-    }
-
-    @Override
-    public List<EntityField> getFields(List<MessageDTO> messageDTOs) {
-        return messageDTOs.stream()
-                .map(this::getField)
-                .collect(Collectors.toList());
+        return EntityField.builder()
+                .field(messageDTO.getToAccountNames())
+                .entityId(messageDTO.getId())
+                .build();
     }
 
     private boolean findAccountByNames(String names) {

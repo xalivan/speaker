@@ -4,14 +4,12 @@ import com.speaker.dto.MessageDTO;
 import com.speaker.dto.ValidatorError;
 import com.speaker.entities.Message;
 import com.speaker.service.MessageService;
-import com.speaker.service.Response;
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @Api
 @RestController
@@ -26,7 +24,7 @@ public class MessageController {
     }
 
     @PostMapping("add/messages")
-    public ResponseEntity<List<List<ValidatorError>>> addFriendMassages(@RequestBody List<MessageDTO> messageDTO) {
+    public ResponseEntity<List<ValidatorError>> addFriendMassages(@RequestBody List<MessageDTO> messageDTO) {
         return ResponseEntity.ok(messageService.addMessage(messageDTO));
     }
 }

@@ -1,14 +1,10 @@
 package com.speaker.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-@Getter
-@RequiredArgsConstructor
-@AllArgsConstructor
+@Data
 @Builder
 public class EntityField {
-    public Object field;
+    private final Object field;
+    private final Integer entityId;
 }

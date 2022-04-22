@@ -31,12 +31,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public   List<List<ValidatorError>> addMessage(List<MessageDTO> messageDTOs) {
-        List<List<ValidatorError>> validatorErrors = messageDTOs.stream()
-                .map(messageDTOValidators::validate)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
+    public List<ValidatorError> addMessage(List<MessageDTO> messageDTOs) {
+        List<ValidatorError> validatorErrors = messageDTOValidators.validate(messageDTOs);
         if (validatorErrors.size() > 0) {
             return validatorErrors;
         }
@@ -46,9 +42,9 @@ public class MessageServiceImpl implements MessageService {
                 .collect(Collectors.toList());
         if (messageDTOs.size() == messages.size()) {
             messageRepository.createMessages(messages);
-            return List.of(List.of(new ValidatorError("messages was created", "messageDTOs")));
+            return List.of(ValidatorError.builder().message("messages was created").field("messageDTOs").build());
         }
-        return List.of(List.of(new ValidatorError("messages no created", "messageDTOs")));
+        return List.of(ValidatorError.builder().message("messages no created").field("messageDTOs").build());
     }
 
     private Message convertToMessage(MessageDTO messageDTO) {

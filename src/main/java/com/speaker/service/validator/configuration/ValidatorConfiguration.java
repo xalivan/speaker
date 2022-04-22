@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ public class ValidatorConfiguration {
             }
 
             @Override
-            public List<List<ValidatorError>> validate(List<MessageDTO> entities) {
+            public List<ValidatorError> validate(List<MessageDTO> entities) {
                 return validateEntityList(messageValidators, entities);
             }
         };
@@ -43,7 +44,7 @@ public class ValidatorConfiguration {
             }
 
             @Override
-            public List<List<ValidatorError>> validate(List<AccountDTO> entities) {
+            public List<ValidatorError> validate(List<AccountDTO> entities) {
                 return validateEntityList(accountValidators, entities);
             }
         };
@@ -56,10 +57,9 @@ public class ValidatorConfiguration {
                 .collect(Collectors.toList());
     }
 
-    private <T> List<List<ValidatorError>> validateEntityList(List<Validator<T>> validatorList, List<T> entity) {
-        return validatorList.stream()
-                .map(validator -> validator.validateList(validator.getFields(entity)))
-                .filter(Objects::nonNull)
+    private <T> List<ValidatorError> validateEntityList(List<Validator<T>> validatorList, List<T> entities) {
+        return entities.stream().map(entity -> validateEntity(validatorList, entity))
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
 }

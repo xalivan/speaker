@@ -13,63 +13,57 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 class MessageTextValidatorImplTest {
+    private static final String ACCOUNT_FIRST_NAME = "Ivan";
+    private static final String LAST_NAME = "Mazur";
+    private static final String SEPARATOR = " ";
+    private static final String ACCOUNT_FIRST_LAST_NAME = ACCOUNT_FIRST_NAME + SEPARATOR + LAST_NAME;
+    private static final String FRIEND_FIRST_NAME = "Victor";
+    private static final String FRIEND_FIRST_LAST_NAME = FRIEND_FIRST_NAME + SEPARATOR + LAST_NAME;
     private static final int ACCOUNT_ID = 1;
     private static final int FRIEND_ID = 2;
+    private static final int ENTITY_FIELD_ID = 5;
+    private static final String ENTITY_FIELD_TEXT = "text";
     private static final LocalDateTime LOCAL_DATE_TIME_NOW = LocalDateTime.now();
     @InjectMocks
     private MessageTextValidatorImpl messageTextValidator;
 
     @Test
     public void validateSuccess() {
-        MessageDTO messageDTO = generateMessageDTO(ACCOUNT_ID, FRIEND_ID, "text", LOCAL_DATE_TIME_NOW, Status.NEW);
-        EntityField entityField = generateEntityField(messageDTO);
-        assertNull(messageTextValidator.validate(entityField));
+        List<MessageDTO> messageDTOs = generateMessageDTOList(20, ENTITY_FIELD_TEXT);
+        List<EntityField> entityFields = generateEntityFieldList(messageDTOs);
+        assertThat(messageTextValidator.validate(entityFields.get(0)), nullValue());
+        assertThat(messageTextValidator.validate(entityFields.get(1)), nullValue());
     }
 
     @Test
     public void validateWhenTextIsEmpty() {
-        MessageDTO messageDTO = generateMessageDTO(ACCOUNT_ID, FRIEND_ID, null, LOCAL_DATE_TIME_NOW, Status.NEW);
-        EntityField entityField = generateEntityField(messageDTO);
-        ValidatorError validatorError = generateValidatorError(ErrorType.EMPTY);
-        assertThat(messageTextValidator.validate(entityField), is(validatorError));
+        List<MessageDTO> messageDTOs = generateMessageDTOList(20, null);
+        List<EntityField> entityFields = generateEntityFieldList(messageDTOs);
+        assertThat(messageTextValidator.validate(entityFields.get(0)), is(createValidatorError(ErrorType.EMPTY, entityFields.get(0))));
+        assertThat(messageTextValidator.validate(entityFields.get(1)), nullValue());
     }
 
     @Test
     public void validateWhenTextNotValid() {
-        MessageDTO messageDTO = generateMessageDTO(ACCOUNT_ID, FRIEND_ID, "", LOCAL_DATE_TIME_NOW, Status.NEW);
-        EntityField entityField = generateEntityField(messageDTO);
-        ValidatorError validatorError = generateValidatorError(ErrorType.NOT_VALID);
-        assertThat(messageTextValidator.validate(entityField), is(validatorError));
+        List<MessageDTO> messageDTOs = generateMessageDTOList(20, "");
+        List<EntityField> entityFields = generateEntityFieldList(messageDTOs);
+        assertThat(messageTextValidator.validate(entityFields.get(0)), is(createValidatorError(ErrorType.NOT_VALID, entityFields.get(0))));
+        assertThat(messageTextValidator.validate(entityFields.get(1)), nullValue());
     }
 
     @Test
     public void getField() {
-        MessageDTO messageDTO = generateMessageDTO(ACCOUNT_ID, FRIEND_ID, "text", LOCAL_DATE_TIME_NOW, Status.NEW);
-        assertThat(messageTextValidator.getField(messageDTO).getField(), is(new EntityField(messageDTO.getText()).getField()));
-    }
-
-    @Test
-    public void validateList() {
-        List<MessageDTO> messageDTOs = generateMessageDTOList();
-        List<EntityField> entityFields = generateEntityFields(messageDTOs);
-        assertThat(messageTextValidator.validateList(entityFields), is(generateValidatorErrors(entityFields)));
-    }
-
-    @Test
-    public void getFields() {
-        List<MessageDTO> messageDTOs = generateMessageDTOList();
-        List<EntityField> entityFields = generateEntityFields(messageDTOs);
-        assertThat(messageTextValidator.getFields(messageDTOs).get(0).getField(), is(entityFields.get(0).getField()));
-        assertThat(messageTextValidator.getFields(messageDTOs).get(1).getField(), is(entityFields.get(1).getField()));
+        MessageDTO messageDTO = generateMessageDTO(ENTITY_FIELD_ID, ENTITY_FIELD_TEXT);
+        EntityField entityField = generateEntityField(messageDTO);
+        assertThat(messageTextValidator.getField(messageDTO), is(entityField));
     }
 
     @Test
@@ -77,50 +71,45 @@ class MessageTextValidatorImplTest {
         assertThat(messageTextValidator.getType(), is(FieldType.TEXT));
     }
 
-    private List<ValidatorError> generateValidatorErrors(List<EntityField> entityFields) {
-        return entityFields.stream()
-                .map(el -> generateValidatorErrorEmpty())
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
-
-    private MessageDTO generateMessageDTO(int fromAccountId, int toAccountId, String text, LocalDateTime date, Status status) {
+    private MessageDTO generateMessageDTO(Integer id, String text) {
         return MessageDTO.builder()
-                .id(5)
-                .fromAccountId(fromAccountId)
-                .toAccountId(toAccountId)
+                .id(id)
+                .fromAccountId(ACCOUNT_ID)
+                .toAccountId(FRIEND_ID)
                 .text(text)
-                .date(date)
-                .status(status)
+                .date(LOCAL_DATE_TIME_NOW)
+                .status(Status.NEW)
+                .fromAccountNames(ACCOUNT_FIRST_LAST_NAME)
+                .toAccountNames(FRIEND_FIRST_LAST_NAME)
                 .build();
     }
 
-    private List<MessageDTO> generateMessageDTOList() {
-        MessageDTO messageDTO = generateMessageDTO(ACCOUNT_ID, FRIEND_ID, "text", LOCAL_DATE_TIME_NOW, Status.NEW);
-        return List.of(messageDTO, messageDTO);
+    private List<MessageDTO> generateMessageDTOList(Integer id, String text) {
+        return List.of(generateMessageDTO(id, text), generateMessageDTO(ENTITY_FIELD_ID, ENTITY_FIELD_TEXT));
     }
 
     private EntityField generateEntityField(MessageDTO messageDTO) {
         return EntityField.builder()
                 .field(messageDTO.getText())
+                .entityId(messageDTO.getId())
                 .build();
     }
 
-    private List<EntityField> generateEntityFields(List<MessageDTO> messageDTOs) {
+    private List<EntityField> generateEntityFieldList(List<MessageDTO> messageDTOs) {
         return messageDTOs.stream()
-                .map(this::generateEntityField)
+                .map(messageDTO -> EntityField.builder()
+                        .field(messageDTO.getText())
+                        .entityId(messageDTO.getId())
+                        .build())
                 .collect(Collectors.toList());
     }
 
-    private ValidatorError generateValidatorError(ErrorType errorType) {
+    private ValidatorError createValidatorError(ErrorType errorType, EntityField entityField) {
         return ValidatorError.builder()
                 .message(errorType.getError())
                 .field(generateType().getFieldName())
+                .entityId(entityField.getEntityId())
                 .build();
-    }
-
-    private ValidatorError generateValidatorErrorEmpty() {
-        return null;
     }
 
     private FieldType generateType() {

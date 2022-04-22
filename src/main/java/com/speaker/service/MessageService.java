@@ -10,5 +10,5 @@ import java.util.Set;
 public interface MessageService {
     List<Message> getMessagesByAccountId(int accountId);
 
-    List<List<ValidatorError>> addMessage(List<MessageDTO> messageDTO);
+    List<ValidatorError> addMessage(List<MessageDTO> messageDTO);
 }
