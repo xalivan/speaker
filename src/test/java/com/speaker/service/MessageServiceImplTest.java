@@ -2,10 +2,12 @@ package com.speaker.service;
 
 import com.speaker.convertors.MessageConvertor;
 import com.speaker.dto.MessageDTO;
+import com.speaker.dto.ValidatorError;
 import com.speaker.entities.Message;
 import com.speaker.entities.Status;
 import com.speaker.repository.AccountRepository;
 import com.speaker.repository.MessageRepository;
+import com.speaker.service.validator.FieldValidators;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -39,6 +42,8 @@ class MessageServiceImplTest {
     private MessageRepository messageRepository;
     @Mock
     private MessageConvertor messageConvertor;
+    @Mock
+    private FieldValidators<MessageDTO> messageDTOValidators;
     @InjectMocks
     private MessageServiceImpl messageService;
 
@@ -52,29 +57,31 @@ class MessageServiceImplTest {
     @Test
     public void createdMessageSuccess() {
         List<Message> message = generateMessageList();
-        List<MessageDTO> messageDTO = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
+        List<MessageDTO> messageDTOs = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
+        List<ValidatorError> validatorErrors = generateValidatorErrors(messageDTOs, "messages was created", MessageDTO.class.getSimpleName());
+        when(messageDTOValidators.validate(messageDTOs)).thenReturn(List.of());
         when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID));
         when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID));
-        when(messageConvertor.convertToMessage(messageDTO.get(INDEX_0), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_0));
-        when(messageConvertor.convertToMessage(messageDTO.get(1), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_1));
+        when(messageConvertor.convertToMessage(messageDTOs.get(INDEX_0), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_0));
+        when(messageConvertor.convertToMessage(messageDTOs.get(1), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_1));
         when(messageRepository.createMessages(message)).thenReturn(INSERT_TRUE);
-        assertThat(messageService.addMessage(messageDTO), is(Response.TRUE));
+        assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
     }
 
     @Test
-    public void  messageNotCreatedWhenAccountIdIsNull() {
-        List<MessageDTO> messageDTO = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
-        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.empty());
-        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID));
-        assertThat(messageService.addMessage(messageDTO), is(Response.FALSE));
-        verify(accountRepository, times(2)).findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME);
-        verify(accountRepository, times(2)).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
+    public void messageNotCreatedWhenValidatorHasErrors() {
+        List<MessageDTO> messageDTOs = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
+        List<ValidatorError> validatorErrors = generateValidatorErrors(messageDTOs, "messages no created", MessageDTO.class.getSimpleName());
+        when(messageDTOValidators.validate(messageDTOs)).thenReturn(validatorErrors);
+        assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
     }
 
     @Test
     public void messageNotCreatedWhenAccountNameIsNull() {
+        List<MessageDTO> messageDTOs = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
+        List<ValidatorError> validatorErrors = generateValidatorErrors(messageDTOs, "messages no created", MessageDTO.class.getSimpleName());
         List<MessageDTO> messageDTO = generateMessageDTOList(null, FRIEND_FIRST_LAST_NAME);
-        assertThat(messageService.addMessage(messageDTO), is(Response.FALSE));
+        assertThat(messageService.addMessage(messageDTO), is(validatorErrors));
         verify(accountRepository, times(2)).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
     }
 
@@ -118,5 +125,15 @@ class MessageServiceImplTest {
                         .fromAccountNames(accountName)
                         .toAccountNames(friendName)
                         .build());
+    }
+
+    private List<ValidatorError> generateValidatorErrors(List<MessageDTO> messageDTOs, String message, String fields) {
+        return messageDTOs.stream()
+                .map(messageDTO -> ValidatorError.builder()
+                        .message(message)
+                        .field(fields)
+                        .entityId(messageDTO.getId())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

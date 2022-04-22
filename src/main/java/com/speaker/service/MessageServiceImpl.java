@@ -10,9 +10,10 @@ import com.speaker.service.validator.FieldValidators;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.speaker.service.util.StringParser.splitBySpace;
 
@@ -42,9 +43,9 @@ public class MessageServiceImpl implements MessageService {
                 .collect(Collectors.toList());
         if (messageDTOs.size() == messages.size()) {
             messageRepository.createMessages(messages);
-            return List.of(ValidatorError.builder().message("messages was created").field("messageDTOs").build());
+            return generateValidatorErrors(messageDTOs, "messages was created", MessageDTO.class.getSimpleName());
         }
-        return List.of(ValidatorError.builder().message("messages no created").field("messageDTOs").build());
+        return generateValidatorErrors(messageDTOs, "messages no created", MessageDTO.class.getSimpleName());
     }
 
     private Message convertToMessage(MessageDTO messageDTO) {
@@ -57,6 +58,16 @@ public class MessageServiceImpl implements MessageService {
                     friendId.get());
         }
         return null;
+    }
+
+    private List<ValidatorError> generateValidatorErrors(List<MessageDTO> messageDTOs, String message, String fields) {
+        return messageDTOs.stream()
+                .map(messageDTO -> ValidatorError.builder()
+                        .message(message)
+                        .field(fields)
+                        .entityId(messageDTO.getId())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private Optional<Integer> findAccountByNames(String names) {
