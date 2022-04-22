@@ -9,16 +9,22 @@ import com.speaker.service.validator.type.ErrorType;
 import com.speaker.service.validator.type.FieldType;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static java.util.Objects.isNull;
 
 @Component
 public class MessageTextValidatorImpl extends AbstractValidator implements Validator<MessageDTO> {
     @Override
     public ValidatorError validate(EntityField entityField) {
-        if (isNull(entityField.getField().toString())) {
+        Object fieldName = entityField.getField();
+        if (isNull(fieldName)) {
             return createValidatorError(ErrorType.EMPTY);
         }
-        if (entityField.getField().equals("")) {
+        if (fieldName.equals("")) {
             return createValidatorError(ErrorType.NOT_VALID);
         }
         return null;
@@ -27,6 +33,21 @@ public class MessageTextValidatorImpl extends AbstractValidator implements Valid
     @Override
     public EntityField getField(MessageDTO messageDTO) {
         return new EntityField(messageDTO.getText());
+    }
+
+    @Override
+    public List<ValidatorError> validateList(List<EntityField> entityFields) {
+        return entityFields.stream()
+                .map(this::validate)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EntityField> getFields(List<MessageDTO> messageDTOs) {
+        return messageDTOs.stream()
+                .map(this::getField)
+                .collect(Collectors.toList());
     }
 
     @Override

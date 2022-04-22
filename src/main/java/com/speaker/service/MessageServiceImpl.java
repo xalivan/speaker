@@ -10,11 +10,9 @@ import com.speaker.service.validator.FieldValidators;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.speaker.service.util.StringParser.splitBySpace;
 
@@ -32,12 +30,13 @@ public class MessageServiceImpl implements MessageService {
         return messageRepository.findAllByAccountId(accountId);
     }
 
-        @Override
-    public List<ValidatorError> addMessage(List<MessageDTO> messageDTOs) {
-        List<ValidatorError> validatorErrors = messageDTOs.stream()
+    @Override
+    public   List<List<ValidatorError>> addMessage(List<MessageDTO> messageDTOs) {
+        List<List<ValidatorError>> validatorErrors = messageDTOs.stream()
                 .map(messageDTOValidators::validate)
-                .flatMap(Collection::stream)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
         if (validatorErrors.size() > 0) {
             return validatorErrors;
         }
@@ -46,10 +45,10 @@ public class MessageServiceImpl implements MessageService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         if (messageDTOs.size() == messages.size()) {
-           messageRepository.createMessages(messages);
-           return List.of(new ValidatorError("messages  created", ""));
+            messageRepository.createMessages(messages);
+            return List.of(List.of(new ValidatorError("messages was created", "messageDTOs")));
         }
-        return List.of(new ValidatorError("messages no created", ""));
+        return List.of(List.of(new ValidatorError("messages no created", "messageDTOs")));
     }
 
     private Message convertToMessage(MessageDTO messageDTO) {

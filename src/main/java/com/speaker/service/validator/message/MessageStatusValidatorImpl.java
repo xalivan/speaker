@@ -10,22 +10,39 @@ import com.speaker.service.validator.type.ErrorType;
 import com.speaker.service.validator.type.FieldType;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Component
 public class MessageStatusValidatorImpl extends AbstractValidator implements Validator<MessageDTO> {
 
     @Override
     public ValidatorError validate(EntityField entityField) {
-        if (!Objects.equals(entityField.getField().toString(), Status.NEW.name())) {
+        if (!Status.NEW.equals(entityField.getField())) {
             return createValidatorError(ErrorType.NOT_FOUND);
         }
         return null;
     }
 
     @Override
+    public List<ValidatorError> validateList(List<EntityField> entityFields) {
+        return entityFields.stream()
+                .map(this::validate)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public EntityField getField(MessageDTO messageDTO) {
         return new EntityField(messageDTO.getStatus());
+    }
+
+    @Override
+    public List<EntityField> getFields(List<MessageDTO> messageDTOs) {
+        return messageDTOs.stream()
+                .map(this::getField)
+                .collect(Collectors.toList());
     }
 
     @Override

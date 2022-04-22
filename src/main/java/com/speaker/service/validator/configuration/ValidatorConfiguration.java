@@ -26,6 +26,11 @@ public class ValidatorConfiguration {
             public List<ValidatorError> validate(MessageDTO entity) {
                 return validateEntity(messageValidators, entity);
             }
+
+            @Override
+            public List<List<ValidatorError>> validate(List<MessageDTO> entities) {
+                return validateEntityList(messageValidators, entities);
+            }
         };
     }
 
@@ -36,12 +41,24 @@ public class ValidatorConfiguration {
             public List<ValidatorError> validate(AccountDTO entity) {
                 return validateEntity(accountValidators, entity);
             }
+
+            @Override
+            public List<List<ValidatorError>> validate(List<AccountDTO> entities) {
+                return validateEntityList(accountValidators, entities);
+            }
         };
     }
 
     private <T> List<ValidatorError> validateEntity(List<Validator<T>> validatorList, T entity) {
         return validatorList.stream()
                 .map(validator -> validator.validate(validator.getField(entity)))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    private <T> List<List<ValidatorError>> validateEntityList(List<Validator<T>> validatorList, List<T> entity) {
+        return validatorList.stream()
+                .map(validator -> validator.validateList(validator.getFields(entity)))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
