@@ -8,6 +8,7 @@ import com.speaker.entities.Status;
 import com.speaker.repository.AccountRepository;
 import com.speaker.repository.MessageRepository;
 import com.speaker.service.validator.FieldValidators;
+import com.speaker.service.validator.type.ErrorType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,10 +22,12 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceImplTest {
+    private static final String FIELD_TEXT = "text";
     private static final int ACCOUNT_ID = 1;
     private static final int FRIEND_ID = 2;
     private static final int INDEX_0 = 0;
@@ -56,78 +59,91 @@ class MessageServiceImplTest {
 
     @Test
     public void createdMessageSuccess() {
-        List<Message> message = generateMessageList();
-        List<MessageDTO> messageDTOs = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
-        List<ValidatorError> validatorErrors = generateValidatorErrors(messageDTOs, "messages was created", MessageDTO.class.getSimpleName());
-        when(messageDTOValidators.validate(messageDTOs)).thenReturn(List.of());
+        List<MessageDTO> messageDTOs = generateMessageDTOList(FIELD_TEXT);
+        List<ValidatorError> validatorErrors = List.of();
+        when(messageDTOValidators.validate(messageDTOs)).thenReturn(validatorErrors);
         when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID));
         when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID));
+        List<Message> message = generateMessageList();
         when(messageConvertor.convertToMessage(messageDTOs.get(INDEX_0), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_0));
-        when(messageConvertor.convertToMessage(messageDTOs.get(1), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_1));
+        when(messageConvertor.convertToMessage(messageDTOs.get(INDEX_1), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_1));
         when(messageRepository.createMessages(message)).thenReturn(INSERT_TRUE);
         assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
     }
 
     @Test
-    public void messageNotCreatedWhenValidatorHasErrors() {
-        List<MessageDTO> messageDTOs = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
-        List<ValidatorError> validatorErrors = generateValidatorErrors(messageDTOs, "messages no created", MessageDTO.class.getSimpleName());
+    public void oneMessageNotCreatedWhenTextFieldHasSpaces() {
+        List<MessageDTO> messageDTOs = generateMessageDTOList("  ");
+        List<ValidatorError> validatorErrors = generateValidatorErrorsFromList(List.of(messageDTOs.get(INDEX_1)), ErrorType.NOT_VALID.getError(), FIELD_TEXT);
         when(messageDTOValidators.validate(messageDTOs)).thenReturn(validatorErrors);
         assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
     }
 
     @Test
-    public void messageNotCreatedWhenAccountNameIsNull() {
-        List<MessageDTO> messageDTOs = generateMessageDTOList(ACCOUNT_FIRST_LAST_NAME, FRIEND_FIRST_LAST_NAME);
-        List<ValidatorError> validatorErrors = generateValidatorErrors(messageDTOs, "messages no created", MessageDTO.class.getSimpleName());
-        List<MessageDTO> messageDTO = generateMessageDTOList(null, FRIEND_FIRST_LAST_NAME);
-        assertThat(messageService.addMessage(messageDTO), is(validatorErrors));
-        verify(accountRepository, times(2)).findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME);
+    public void oneMessageNotCreatedWhenTextFieldHasNull() {
+        List<MessageDTO> messageDTOs = generateMessageDTOList(null);
+        List<ValidatorError> validatorErrors = generateValidatorErrorsFromList(List.of(messageDTOs.get(INDEX_1)), ErrorType.EMPTY.getError(), FIELD_TEXT);
+        when(messageDTOValidators.validate(messageDTOs)).thenReturn(validatorErrors);
+        assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
+    }
+
+    @Test
+    public void oneMessageBeCreatedIfSecondMessageTextFieldHasErrors() {
+        List<MessageDTO> messageDTOs = generateMessageDTOList("  ");
+        List<ValidatorError> validatorErrors = generateValidatorErrorsFromList(List.of(messageDTOs.get(1)), ErrorType.NOT_VALID.getError(), FIELD_TEXT);
+        when(messageDTOValidators.validate(messageDTOs)).thenReturn(validatorErrors);
+        List<Message> message = List.of(generateMessageList().get(INDEX_0));
+        when(accountRepository.findAccountIdByNameAndLastName(ACCOUNT_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(ACCOUNT_ID));
+        when(accountRepository.findAccountIdByNameAndLastName(FRIEND_FIRST_NAME, LAST_NAME)).thenReturn(Optional.of(FRIEND_ID));
+        when(messageConvertor.convertToMessage(messageDTOs.get(INDEX_0), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_0));
+        when(messageRepository.createMessages(message)).thenReturn(INSERT_TRUE);
+        assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
+        verify(messageRepository).createMessages(message);
     }
 
     private List<Message> generateMessageList() {
         return List.of(Message.builder()
-                        .id(5)
+                        .id(10)
                         .fromAccountId(ACCOUNT_ID)
                         .toAccountId(FRIEND_ID)
-                        .text("text 1")
+                        .text(FIELD_TEXT)
                         .date(LocalDateTime.now())
                         .status(Status.NEW)
                         .build(),
                 Message.builder()
-                        .id(6)
+                        .id(20)
                         .fromAccountId(ACCOUNT_ID)
                         .toAccountId(FRIEND_ID)
-                        .text("text 2")
-                        .date(LocalDateTime.now())
-                        .status(Status.READ)
-                        .build());
-    }
-
-    private List<MessageDTO> generateMessageDTOList(String accountName, String friendName) {
-        return List.of(MessageDTO.builder()
-                        .id(5)
-                        .fromAccountId(ACCOUNT_ID)
-                        .toAccountId(FRIEND_ID)
-                        .text("text 1")
+                        .text(FIELD_TEXT)
                         .date(LocalDateTime.now())
                         .status(Status.NEW)
-                        .fromAccountNames(accountName)
-                        .toAccountNames(friendName)
-                        .build(),
-                MessageDTO.builder()
-                        .id(6)
-                        .fromAccountId(ACCOUNT_ID)
-                        .toAccountId(FRIEND_ID)
-                        .text("text 2")
-                        .date(LocalDateTime.now())
-                        .status(Status.READ)
-                        .fromAccountNames(accountName)
-                        .toAccountNames(friendName)
                         .build());
     }
 
-    private List<ValidatorError> generateValidatorErrors(List<MessageDTO> messageDTOs, String message, String fields) {
+    private List<MessageDTO> generateMessageDTOList(String text) {
+        return List.of(MessageDTO.builder()
+                        .id(10)
+                        .fromAccountId(ACCOUNT_ID)
+                        .toAccountId(FRIEND_ID)
+                        .text(FIELD_TEXT)
+                        .date(LocalDateTime.now())
+                        .status(Status.NEW)
+                        .fromAccountNames(ACCOUNT_FIRST_LAST_NAME)
+                        .toAccountNames(FRIEND_FIRST_LAST_NAME)
+                        .build(),
+                MessageDTO.builder()
+                        .id(20)
+                        .fromAccountId(ACCOUNT_ID)
+                        .toAccountId(FRIEND_ID)
+                        .text(text)
+                        .date(LocalDateTime.now())
+                        .status(Status.NEW)
+                        .fromAccountNames(ACCOUNT_FIRST_LAST_NAME)
+                        .toAccountNames(FRIEND_FIRST_LAST_NAME)
+                        .build());
+    }
+
+    private List<ValidatorError> generateValidatorErrorsFromList(List<MessageDTO> messageDTOs, String message, String fields) {
         return messageDTOs.stream()
                 .map(messageDTO -> ValidatorError.builder()
                         .message(message)

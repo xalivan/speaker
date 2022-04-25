@@ -21,15 +21,12 @@ public class MessageToAccountNamesValidatorImpl extends AbstractValidator implem
 
     @Override
     public ValidatorError validate(EntityField entityField) {
-        Object fieldName = entityField.getField();
-        if (isNull(fieldName)) {
+        String fieldNames = (String) entityField.getField();
+        if (isNull(fieldNames)) {
             return createValidatorError(ErrorType.EMPTY, entityField);
         }
-        if (splitBySpace(fieldName.toString()).isEmpty()) {
+        if (findAccountByNames(fieldNames)) {
             return createValidatorError(ErrorType.NOT_VALID, entityField);
-        }
-        if (findAccountByNames(fieldName.toString())) {
-            return createValidatorError(ErrorType.NOT_FOUND, entityField);
         }
         return null;
     }

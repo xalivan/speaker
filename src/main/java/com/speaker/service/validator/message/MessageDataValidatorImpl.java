@@ -10,13 +10,11 @@ import com.speaker.service.validator.type.FieldType;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 import static java.util.Objects.isNull;
 
 @Component
 public class MessageDataValidatorImpl extends AbstractValidator implements Validator<MessageDTO> {
-    private final long CURRENT_TIME = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
     @Override
     public ValidatorError validate(EntityField entityField) {
@@ -44,6 +42,6 @@ public class MessageDataValidatorImpl extends AbstractValidator implements Valid
     }
 
     public boolean checkIsFutureTime(LocalDateTime localDateTime) {
-        return CURRENT_TIME < localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return LocalDateTime.now().isBefore(localDateTime);
     }
 }

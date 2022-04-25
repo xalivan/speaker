@@ -15,11 +15,11 @@ import static java.util.Objects.isNull;
 public class MessageTextValidatorImpl extends AbstractValidator implements Validator<MessageDTO> {
     @Override
     public ValidatorError validate(EntityField entityField) {
-        Object fieldName = entityField.getField();
+       String fieldName = (String)entityField.getField();
         if (isNull(fieldName)) {
             return createValidatorError(ErrorType.EMPTY, entityField);
         }
-        if (fieldName.equals("")) {
+        if (fieldName.trim().equals("")) {
             return createValidatorError(ErrorType.NOT_VALID, entityField);
         }
         return null;

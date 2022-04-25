@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import static com.speaker.service.util.StringParser.splitBySpace;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 
 @Service
@@ -34,18 +36,23 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public List<ValidatorError> addMessage(List<MessageDTO> messageDTOs) {
         List<ValidatorError> validatorErrors = messageDTOValidators.validate(messageDTOs);
-        if (validatorErrors.size() > 0) {
+        Set<Integer> entityIdsWithErrors = validatorErrors.stream()
+                .map(ValidatorError::getEntityId)
+                .collect(toSet());
+        List<Message> messages = convertToListMessages(messageDTOs, entityIdsWithErrors);
+        if (!messages.isEmpty()) {
+            messageRepository.createMessages(messages);
             return validatorErrors;
         }
-        List<Message> messages = messageDTOs.stream()
+        return validatorErrors;
+    }
+
+    private List<Message> convertToListMessages(List<MessageDTO> messageDTOList, Set<Integer> entityIdsWithError) {
+        return messageDTOList.stream()
+                .filter(messageDTO -> !entityIdsWithError.contains(messageDTO.getId()))
                 .map(this::convertToMessage)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        if (messageDTOs.size() == messages.size()) {
-            messageRepository.createMessages(messages);
-            return generateValidatorErrors(messageDTOs, "messages was created", MessageDTO.class.getSimpleName());
-        }
-        return generateValidatorErrors(messageDTOs, "messages no created", MessageDTO.class.getSimpleName());
+                .collect(toList());
     }
 
     private Message convertToMessage(MessageDTO messageDTO) {
@@ -58,16 +65,6 @@ public class MessageServiceImpl implements MessageService {
                     friendId.get());
         }
         return null;
-    }
-
-    private List<ValidatorError> generateValidatorErrors(List<MessageDTO> messageDTOs, String message, String fields) {
-        return messageDTOs.stream()
-                .map(messageDTO -> ValidatorError.builder()
-                        .message(message)
-                        .field(fields)
-                        .entityId(messageDTO.getId())
-                        .build())
-                .collect(Collectors.toList());
     }
 
     private Optional<Integer> findAccountByNames(String names) {

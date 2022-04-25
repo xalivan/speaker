@@ -14,7 +14,8 @@ public class MessageToAccountIdValidatorImpl extends AbstractValidator implement
 
     @Override
     public ValidatorError validate(EntityField entityField) {
-        if ((int) entityField.getField() <= 0) {
+        Integer field = (Integer) entityField.getField();
+        if (field <= 0) {
             return createValidatorError(ErrorType.NOT_VALID, entityField);
         }
         return null;
