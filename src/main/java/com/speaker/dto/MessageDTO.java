@@ -3,12 +3,14 @@ package com.speaker.dto;
 import com.speaker.entities.Status;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class MessageDTO {
+@RequiredArgsConstructor
+public class MessageDTO implements BaseEntityDTO {
     private final int id;
     private final int fromAccountId;
     private final int toAccountId;

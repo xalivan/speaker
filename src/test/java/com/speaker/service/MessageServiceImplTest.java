@@ -1,6 +1,7 @@
 package com.speaker.service;
 
 import com.speaker.convertors.MessageConvertor;
+import com.speaker.dto.BaseEntityDTO;
 import com.speaker.dto.MessageDTO;
 import com.speaker.dto.ValidatorError;
 import com.speaker.entities.Message;
@@ -22,8 +23,7 @@ import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceImplTest {
@@ -47,6 +47,8 @@ class MessageServiceImplTest {
     private MessageConvertor messageConvertor;
     @Mock
     private FieldValidators<MessageDTO> messageDTOValidators;
+    @Mock
+    private KafkaHandlerErrorsServiceImpl<BaseEntityDTO> kafkaHandlerErrorsService;
     @InjectMocks
     private MessageServiceImpl messageService;
 
@@ -69,6 +71,7 @@ class MessageServiceImplTest {
         when(messageConvertor.convertToMessage(messageDTOs.get(INDEX_1), FRIEND_ID, ACCOUNT_ID)).thenReturn(message.get(INDEX_1));
         when(messageRepository.createMessages(message)).thenReturn(INSERT_TRUE);
         assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
+        verify(kafkaHandlerErrorsService,  never()).sendConsumer(messageDTOs.get(INDEX_0));
     }
 
     @Test
@@ -77,6 +80,7 @@ class MessageServiceImplTest {
         List<ValidatorError> validatorErrors = generateValidatorErrorsFromList(List.of(messageDTOs.get(INDEX_1)), ErrorType.NOT_VALID.getError(), FIELD_TEXT);
         when(messageDTOValidators.validate(messageDTOs)).thenReturn(validatorErrors);
         assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
+        verify(kafkaHandlerErrorsService,  never()).sendConsumer(messageDTOs.get(INDEX_0));
     }
 
     @Test
@@ -85,6 +89,7 @@ class MessageServiceImplTest {
         List<ValidatorError> validatorErrors = generateValidatorErrorsFromList(List.of(messageDTOs.get(INDEX_1)), ErrorType.EMPTY.getError(), FIELD_TEXT);
         when(messageDTOValidators.validate(messageDTOs)).thenReturn(validatorErrors);
         assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
+        verify(kafkaHandlerErrorsService,  never()).sendConsumer(messageDTOs.get(INDEX_0));
     }
 
     @Test
@@ -99,6 +104,7 @@ class MessageServiceImplTest {
         when(messageRepository.createMessages(message)).thenReturn(INSERT_TRUE);
         assertThat(messageService.addMessage(messageDTOs), is(validatorErrors));
         verify(messageRepository).createMessages(message);
+        verify(kafkaHandlerErrorsService,  never()).sendConsumer(messageDTOs.get(INDEX_0));
     }
 
     private List<Message> generateMessageList() {

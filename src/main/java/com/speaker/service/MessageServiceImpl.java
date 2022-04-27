@@ -1,6 +1,7 @@
 package com.speaker.service;
 
 import com.speaker.convertors.MessageConvertor;
+import com.speaker.dto.BaseEntityDTO;
 import com.speaker.dto.MessageDTO;
 import com.speaker.dto.ValidatorError;
 import com.speaker.entities.Message;
@@ -23,6 +24,7 @@ import static java.util.stream.Collectors.toSet;
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
+    private final KafkaHandlerErrorsService<BaseEntityDTO> kafkaHandlerErrorsService;
     private final MessageRepository messageRepository;
     private final AccountRepository accountRepository;
     private final MessageConvertor messageConvertor;
@@ -39,12 +41,20 @@ public class MessageServiceImpl implements MessageService {
         Set<Integer> entityIdsWithErrors = validatorErrors.stream()
                 .map(ValidatorError::getEntityId)
                 .collect(toSet());
+        sendMessageDTOWithErrorsToKafka(messageDTOs, entityIdsWithErrors);
         List<Message> messages = convertToListMessages(messageDTOs, entityIdsWithErrors);
+
         if (!messages.isEmpty()) {
             messageRepository.createMessages(messages);
             return validatorErrors;
         }
         return validatorErrors;
+    }
+
+    private void sendMessageDTOWithErrorsToKafka(List<MessageDTO> messageDTOList, Set<Integer> entityIdsWithError) {
+        messageDTOList.stream()
+                .filter(messageDTO -> entityIdsWithError.contains(messageDTO.getId()))
+                .forEach(kafkaHandlerErrorsService::sendConsumer);
     }
 
     private List<Message> convertToListMessages(List<MessageDTO> messageDTOList, Set<Integer> entityIdsWithError) {
