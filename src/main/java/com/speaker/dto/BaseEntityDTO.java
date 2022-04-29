@@ -1,5 +1,7 @@
 package com.speaker.dto;
 
-public interface BaseEntityDTO {
+import java.io.Serializable;
+
+public interface BaseEntityDTO extends Serializable {
     int getId();
 }

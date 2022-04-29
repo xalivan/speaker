@@ -11,14 +11,3 @@ spring:
       matching-strategy: ant_path_matcher
   liquibase:
     change-log: 'classpath:/changelog/db.changelog-master.xml'
-  kafka:
-    consumer:
-      bootstrap-servers: localhost:9095
-      group-id: group_id
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: com.speaker.config.kafka.CustomSerializer
-    producer:
-      bootstrap-servers: localhost:9095
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: com.speaker.config.kafka.CustomDeserializer
