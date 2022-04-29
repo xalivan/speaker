@@ -1,20 +1,24 @@
 package com.speaker.dto;
 
 import com.speaker.entities.Status;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class MessageDTO {
-    private final int id;
-    private final int fromAccountId;
-    private final int toAccountId;
-    private final String text;
-    private final LocalDateTime date;
-    private final Status status;
-    private final String fromAccountNames;
-    private final String toAccountNames;
+public class MessageDTO implements BaseEntityDTO {
+    private int id;
+    private int fromAccountId;
+    private int toAccountId;
+    private String text;
+    private LocalDateTime date;
+    private Status status;
+    private String fromAccountNames;
+    private String toAccountNames;
 }

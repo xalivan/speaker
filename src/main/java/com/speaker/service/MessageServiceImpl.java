@@ -1,13 +1,15 @@
 package com.speaker.service;
 
 import com.speaker.convertors.MessageConvertor;
+import com.speaker.dto.BaseEntityDTO;
 import com.speaker.dto.MessageDTO;
 import com.speaker.dto.ValidatorError;
 import com.speaker.entities.Message;
 import com.speaker.repository.AccountRepository;
 import com.speaker.repository.MessageRepository;
-import com.speaker.service.validator.FieldValidators;
+import com.speaker.validator.FieldValidators;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,7 +17,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.speaker.service.util.StringParser.splitBySpace;
+import static com.speaker.service.KafkaHandlerErrorsServiceImpl.TOPICS;
+import static com.speaker.util.StringParser.splitBySpace;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -23,6 +26,7 @@ import static java.util.stream.Collectors.toSet;
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
+    private final KafkaTemplate<String, BaseEntityDTO> kafkaBaseEntityDTOProducer;
     private final MessageRepository messageRepository;
     private final AccountRepository accountRepository;
     private final MessageConvertor messageConvertor;
@@ -39,12 +43,20 @@ public class MessageServiceImpl implements MessageService {
         Set<Integer> entityIdsWithErrors = validatorErrors.stream()
                 .map(ValidatorError::getEntityId)
                 .collect(toSet());
+        sendMessageDTOWithErrorsToKafka(messageDTOs, entityIdsWithErrors);
         List<Message> messages = convertToListMessages(messageDTOs, entityIdsWithErrors);
+
         if (!messages.isEmpty()) {
             messageRepository.createMessages(messages);
             return validatorErrors;
         }
         return validatorErrors;
+    }
+
+    private void sendMessageDTOWithErrorsToKafka(List<MessageDTO> messageDTOList, Set<Integer> entityIdsWithError) {
+        messageDTOList.stream()
+                .filter(messageDTO -> entityIdsWithError.contains(messageDTO.getId()))
+                .forEach(messageDTO -> kafkaBaseEntityDTOProducer.send(TOPICS, messageDTO));
     }
 
     private List<Message> convertToListMessages(List<MessageDTO> messageDTOList, Set<Integer> entityIdsWithError) {

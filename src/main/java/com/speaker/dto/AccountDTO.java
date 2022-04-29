@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @Builder
 @RequiredArgsConstructor
-public class AccountDTO {
+public class AccountDTO implements BaseEntityDTO {
     private final int id;
     private final String name;
     private final String lastName;
