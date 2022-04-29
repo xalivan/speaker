@@ -1,5 +1,7 @@
 package com.speaker.service;
 
-public interface KafkaHandlerErrorsService<T>{
-    void listen(T entity);
+import com.speaker.dto.BaseEntityDTO;
+
+public interface KafkaHandlerErrorsService{
+    void listen(BaseEntityDTO entity);
 }

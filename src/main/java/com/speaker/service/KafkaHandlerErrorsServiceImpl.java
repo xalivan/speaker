@@ -5,9 +5,10 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class KafkaHandlerErrorsServiceImpl implements KafkaHandlerErrorsService<BaseEntityDTO> {
+public class KafkaHandlerErrorsServiceImpl implements KafkaHandlerErrorsService {
     public static final String TOPICS = "messages";
     private static final String GROUP_ID = "group-id";
+
     @Override
     @KafkaListener(topics = TOPICS, groupId = GROUP_ID)
     public void listen(BaseEntityDTO message) {
