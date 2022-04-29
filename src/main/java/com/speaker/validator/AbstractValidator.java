@@ -1,9 +1,9 @@
-package com.speaker.service.validator;
+package com.speaker.validator;
 
 import com.speaker.dto.ValidatorError;
 import com.speaker.entities.EntityField;
-import com.speaker.service.validator.type.ErrorType;
-import com.speaker.service.validator.type.FieldType;
+import com.speaker.validator.type.ErrorType;
+import com.speaker.validator.type.FieldType;
 
 public abstract class AbstractValidator {
 

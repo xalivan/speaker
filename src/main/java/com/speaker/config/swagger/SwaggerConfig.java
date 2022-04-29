@@ -1,4 +1,4 @@
-package com.speaker.config;
+package com.speaker.config.swagger;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

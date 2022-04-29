@@ -1,4 +1,4 @@
-package com.speaker.service.validator;
+package com.speaker.validator;
 
 import com.speaker.dto.ValidatorError;
 

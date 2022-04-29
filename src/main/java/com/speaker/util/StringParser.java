@@ -1,4 +1,4 @@
-package com.speaker.service.util;
+package com.speaker.util;
 
 import java.util.Optional;
 

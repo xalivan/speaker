@@ -11,8 +11,8 @@ import com.speaker.entities.City;
 import com.speaker.entities.CityName;
 import com.speaker.entities.CountryName;
 import com.speaker.repository.AccountRepository;
-import com.speaker.service.util.Pair;
-import com.speaker.service.util.StringParser;
+import com.speaker.util.Pair;
+import com.speaker.util.StringParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
