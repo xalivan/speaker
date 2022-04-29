@@ -1,22 +1,22 @@
-package com.speaker.service.validator.message;
+package com.speaker.validator.message;
 
 import com.speaker.dto.MessageDTO;
 import com.speaker.dto.ValidatorError;
 import com.speaker.entities.EntityField;
 import com.speaker.repository.AccountRepository;
-import com.speaker.service.validator.AbstractValidator;
-import com.speaker.service.validator.Validator;
-import com.speaker.service.validator.type.ErrorType;
-import com.speaker.service.validator.type.FieldType;
+import com.speaker.validator.AbstractValidator;
+import com.speaker.validator.Validator;
+import com.speaker.validator.type.ErrorType;
+import com.speaker.validator.type.FieldType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import static com.speaker.service.util.StringParser.splitBySpace;
+import static com.speaker.util.StringParser.splitBySpace;
 import static java.util.Objects.isNull;
 
 @Component
 @RequiredArgsConstructor
-public class MessageFromAccountNamesValidatorImpl extends AbstractValidator implements Validator<MessageDTO> {
+public class MessageToAccountNamesValidatorImpl extends AbstractValidator implements Validator<MessageDTO> {
     private final AccountRepository accountRepository;
 
     @Override
@@ -34,19 +34,19 @@ public class MessageFromAccountNamesValidatorImpl extends AbstractValidator impl
     @Override
     public EntityField getField(MessageDTO messageDTO) {
         return EntityField.builder()
-                .field(messageDTO.getFromAccountNames())
+                .field(messageDTO.getToAccountNames())
                 .entityId(messageDTO.getId())
                 .build();
-    }
-
-    @Override
-    protected FieldType getType() {
-        return FieldType.FROM_ACCOUNT_NAMES;
     }
 
     private boolean findAccountByNames(String names) {
         return splitBySpace(names)
                 .flatMap(name ->
                         accountRepository.findAccountIdByNameAndLastName(name.getFirst(), name.getSecond())).isEmpty();
+    }
+
+    @Override
+    protected FieldType getType() {
+        return FieldType.TO_ACCOUNT_NAMES;
     }
 }

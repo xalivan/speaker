@@ -1,10 +1,10 @@
-package com.speaker.service.validator.configuration;
+package com.speaker.config.validator;
 
 import com.speaker.dto.AccountDTO;
 import com.speaker.dto.MessageDTO;
 import com.speaker.dto.ValidatorError;
-import com.speaker.service.validator.FieldValidators;
-import com.speaker.service.validator.Validator;
+import com.speaker.validator.FieldValidators;
+import com.speaker.validator.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

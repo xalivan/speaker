@@ -1,4 +1,4 @@
-package com.speaker.service.validator.type;
+package com.speaker.validator.type;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
